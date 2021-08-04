@@ -5,6 +5,8 @@ from bottle import Bottle
 from database.db import create_db_plugin
 
 from routes.user import userRoutes
+from routes.error import errorRoutes
+from routes.list import listRoutes
 
 
 def create_app_instance():
@@ -22,11 +24,13 @@ if __name__ == '__main__':
     app.install(create_db_plugin())
 
     # register routes
+    errorRoutes(app)
     userRoutes(app)
+    listRoutes(app)
 
     # run bottle app with custom configs
     app.run(
-        debug=bool(os.environ.get('DEV')),
-        port=int(os.environ.get('PORT')),
-        reloader=bool(os.environ.get('DEV'))
+        debug=bool(os.getenv('DEV')),
+        port=int(os.getenv('PORT')),
+        reloader=bool(os.getenv('DEV')),
     )

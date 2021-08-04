@@ -11,7 +11,7 @@ from database.models.todo import Todo, TodoItem
 
 
 def create_db_plugin():
-    engine = create_engine(os.environ.get('DB_URL'))
+    engine = create_engine(os.getenv('DB_URL'))
 
     if not database_exists(engine.url):
         create_database(engine.url)

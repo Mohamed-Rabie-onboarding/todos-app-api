@@ -1,5 +1,5 @@
-from utils.error import Error, system_error_item, error_item
-from bottle import Bottle, HTTPError
+from utils.error import Error, error_item
+from bottle import Bottle
 from database.models.user import User
 from utils.getBody import get_body
 import utils.validators as v
@@ -7,15 +7,10 @@ from utils.res import json_res
 from sqlalchemy.orm.session import Session
 from sqlalchemy.exc import IntegrityError
 from pymysql.err import IntegrityError as IE2
+import bcrypt
 
 
 def userRoutes(app: Bottle):
-
-    @app.error(500)
-    def internal_server_error(err: HTTPError):
-        if type(err.exception) == Error:
-            return json_res(errors=err.exception.errors)
-        return json_res(errors=[system_error_item('Internal Server Error.')])
 
     @app.post('/register')
     def register_handler(db: Session):
@@ -31,7 +26,10 @@ def userRoutes(app: Bottle):
         user = User(
             username=body['username'],
             email=body['email'],
-            password=body['password']
+            password=bcrypt.hashpw(
+                body['password'].encode('utf-8'),
+                bcrypt.gensalt(12)
+            )
         )
 
         try:
@@ -42,5 +40,15 @@ def userRoutes(app: Bottle):
             (state, _) = x.args
             if state == 1062:
                 raise Error([error_item('email', 'Email is duplicated.')])
+            else:
+                raise e
 
         return json_res(data={'message': 'Successfully added new user!'})
+
+    @app.post('/login')
+    def login_handler(db: Session):
+        return 'login'
+
+    @app.post('/me')
+    def me_handler(db: Session):
+        return 'me'

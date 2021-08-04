@@ -11,7 +11,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(20), nullable=False)
     email = Column(String(50), unique=True, nullable=False)
-    password = Column(String(50), nullable=False)
+    password = Column(String(80), nullable=False)
     picture = Column(String(100), default='http://placehold.it/250x250')
     created_at = Column(Date, default=datetime.now())
 
