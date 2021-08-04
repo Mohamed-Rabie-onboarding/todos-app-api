@@ -28,5 +28,5 @@ if __name__ == '__main__':
     app.run(
         debug=bool(os.environ.get('DEV')),
         port=int(os.environ.get('PORT')),
-        reload=bool(os.environ.get('DEV'))
+        reloader=bool(os.environ.get('DEV'))
     )

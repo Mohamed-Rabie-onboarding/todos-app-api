@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship
-from base import Base
+from database.models.base import Base
 from datetime import datetime
 
 
@@ -11,7 +11,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    password = Column(String, min=6, nullable=False)
+    password = Column(String, nullable=False)
     picture = Column(String, default='http://placehold.it/250x250')
     created_at = Column(Date, default=datetime.now())
 
