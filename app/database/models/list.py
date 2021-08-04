@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Date, ForeignKey
 from sqlalchemy.orm import relationship
-from base import Base
+from database.models.base import Base
 from datetime import datetime
 
 
@@ -12,5 +12,5 @@ class List(Base):
     created_at = Column(Date, default=datetime.now())
 
     # relations
-    user_id = Column(Integer, ForeignKey('User.id'))
-    todos = relationship('Todo', cascade="all,delete", backref="lists")
+    user_id = Column(Integer, ForeignKey('users.id'))
+    todos = relationship('Todo', cascade="all,delete")

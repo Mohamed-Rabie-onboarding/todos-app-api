@@ -12,6 +12,8 @@ SQLAlchemy = "^1.4.22"
 py-dotenv = "^0.1"
 bottle-sqlalchemy = "^0.4.3"
 PyMySQL = "^1.0.2"
+cryptography = "^3.4.7"
+SQLAlchemy-Utils = "^0.37.8"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.7"

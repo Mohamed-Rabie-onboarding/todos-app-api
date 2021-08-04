@@ -9,11 +9,11 @@ class User(Base):
 
     # table columns
     id = Column(Integer, primary_key=True)
-    username = Column(String, unique=True, nullable=False)
-    email = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
-    picture = Column(String, default='http://placehold.it/250x250')
+    username = Column(String(20), nullable=False)
+    email = Column(String(50), unique=True, nullable=False)
+    password = Column(String(50), nullable=False)
+    picture = Column(String(100), default='http://placehold.it/250x250')
     created_at = Column(Date, default=datetime.now())
 
     # relations
-    lists = relationship('List', cascade="all,delete", backref="users")
+    lists = relationship('List', cascade="all,delete")

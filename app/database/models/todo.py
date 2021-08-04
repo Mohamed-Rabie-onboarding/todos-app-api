@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship
-from base import Base
+from database.models.base import Base
 from datetime import datetime
 
 
@@ -9,12 +9,12 @@ class Todo(Base):
 
     # table columns
     id = Column(Integer, primary_key=True)
-    description = Column(String, nullable=True)
+    description = Column(String(400), nullable=True)
     created_at = Column(Date, default=datetime.now())
 
     # relations
-    items = relationship('TodoItem', cascade="all,delete", backref="todos")
-    list_id = Column(Integer, ForeignKey('List.id'))
+    list_id = Column(Integer, ForeignKey('lists.id'))
+    items = relationship('TodoItem', cascade="all,delete")
 
 
 class TodoItem(Base):
@@ -22,8 +22,8 @@ class TodoItem(Base):
 
     # table columns
     id = Column(Integer, primary_key=True)
-    body = Column(String, nullable=False)
+    body = Column(String(500), nullable=False)
     created_at = Column(Date, default=datetime.now())
 
     # relations
-    todo_id = Column(Integer, ForeignKey('Todo.id'))
+    todo_id = Column(Integer, ForeignKey('todos.id'))
