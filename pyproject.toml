@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "todos-app"
+version = "0.1.0"
+description = "Todos app using bottle and vue"
+authors = ["Muhamed-Rabie <elmdarym@incubaid.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+bottle = "^0.12.19"
+SQLAlchemy = "^1.4.22"
+py-dotenv = "^0.1"
+bottle-sqlalchemy = "^0.4.3"
+PyMySQL = "^1.0.2"
+
+[tool.poetry.dev-dependencies]
+autopep8 = "^1.5.7"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

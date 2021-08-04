@@ -1,0 +1,1 @@
+poetry run python3.9 app/main.py
