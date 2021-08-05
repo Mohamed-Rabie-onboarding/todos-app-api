@@ -69,7 +69,7 @@ def userRoutes(app: Bottle):
             'token': token,
         })
 
-    @app.post('/me')
+    @app.get('/me')
     def me_handler(db: Session):
         id = get_user_id()
         user = db.query(User).filter_by(id=id).first()

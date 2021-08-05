@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Date, ForeignKey
+from sqlalchemy import Column, Integer, Date, ForeignKey, String
 from sqlalchemy.orm import relationship
 from database.models.base import Base
 from datetime import datetime
@@ -9,6 +9,7 @@ class List(Base):
 
     # table columns
     id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
     created_at = Column(Date, default=datetime.now())
 
     # relations
