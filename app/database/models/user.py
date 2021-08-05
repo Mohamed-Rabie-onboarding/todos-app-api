@@ -17,3 +17,5 @@ class User(Base):
 
     # relations
     lists = relationship('List', cascade="all,delete")
+    todos = relationship('Todo', cascade="all,delete")
+    todos_items = relationship('TodoItem', cascade="all,delete")

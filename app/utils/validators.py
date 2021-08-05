@@ -22,6 +22,16 @@ def is_min_length(length: int):
     return next
 
 
+def is_max_length(length: int):
+    def next(str: str):
+        return {
+            'valid': len(str) <= length,
+            'message': 'Too Long value.'
+        }
+    return next
+
+
+
 def validate_body(fields: dict):
     body: dict = get_body()
     errors = []

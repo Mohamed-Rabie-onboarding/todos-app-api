@@ -7,6 +7,7 @@ from database.db import create_db_plugin
 from routes.user import userRoutes
 from routes.error import errorRoutes
 from routes.list import listRoutes
+from routes.todo import todoRoutes
 
 
 def create_app_instance():
@@ -27,6 +28,7 @@ if __name__ == '__main__':
     errorRoutes(app)
     userRoutes(app)
     listRoutes(app)
+    todoRoutes(app)
 
     # run bottle app with custom configs
     app.run(

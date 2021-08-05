@@ -61,6 +61,10 @@ def listRoutes(app: Bottle):
         })
 
         list = db.query(List).filter_by(id=list_id, user_id=id).first()
+
+        if list == None:
+            raise Error([system_error_item('List is not found.')])
+
         list.name = body['name']
         db.commit()
 
