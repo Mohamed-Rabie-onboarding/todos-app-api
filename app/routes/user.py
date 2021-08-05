@@ -71,5 +71,11 @@ def userRoutes(app: Bottle):
 
     @app.post('/me')
     def me_handler(db: Session):
-        get_user_id()
-        return 'me'
+        id = get_user_id()
+        user = db.query(User).filter_by(id=id).first()
+
+        return json_res(data={
+            'id': user.id,
+            'username': user.username,
+            'picture': user.picture,
+        })
