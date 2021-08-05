@@ -53,6 +53,15 @@ def listRoutes(app: Bottle):
             'message': 'Successfully remove list.'
         })
 
-    @app.put('/list/<id>')
-    def update_list_handler(db: Session):
-        return 'update list handler'
+    @app.put('/list/<list_id>')
+    def update_list_handler(db: Session, list_id):
+        id = get_user_id()
+        body = v.validate_body({
+            'name': v.is_min_length(1)
+        })
+
+        list = db.query(List).filter_by(id=list_id, user_id=id).first()
+        list.name = body['name']
+        db.commit()
+
+        return json_res(data={'message': 'Successfully updated list.'})
