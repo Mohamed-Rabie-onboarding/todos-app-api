@@ -15,6 +15,7 @@ PyMySQL = "^1.0.2"
 cryptography = "^3.4.7"
 SQLAlchemy-Utils = "^0.37.8"
 bcrypt = "^3.2.0"
+PyJWT = "^2.1.0"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.7"
