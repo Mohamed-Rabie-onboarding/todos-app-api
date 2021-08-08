@@ -7,26 +7,28 @@ from database.models.todo import Todo, TodoItem
 from utils.error import Error, system_error_item
 
 
+def extract_todo(todo: Todo):
+    return {
+        'id': todo.id,
+        'description': todo.description,
+        'list_id': todo.list_id,
+        'items': todo.items,
+        'created_at': todo.created_at.isoformat()
+    }
+
+
+def extract_todo_item(item: TodoItem):
+    return {
+        'id': item.id,
+        'body': item.body,
+        'done': item.done,
+        'todo_id': item.todo_id,
+        'user_id': item.user_id,
+        'created_at': item.created_at.isoformat()
+    }
+
+
 def todoRoutes(app: Bottle):
-
-    def extract_todo(todo: Todo):
-        return {
-            'id': todo.id,
-            'description': todo.description,
-            'list_id': todo.list_id,
-            'items': todo.items,
-            'created_at': todo.created_at.isoformat()
-        }
-
-    def extract_todo_item(item: TodoItem):
-        return {
-            'id': item.id,
-            'body': item.body,
-            'done': item.done,
-            'todo_id': item.todo_id,
-            'user_id': item.user_id,
-            'created_at': item.created_at.isoformat()
-        }
 
     @app.post('/todo/add/<list_id>')
     def add_todo_handler(db: Session, list_id):

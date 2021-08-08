@@ -5,6 +5,7 @@ from bottle import Bottle
 from sqlalchemy.orm.session import Session
 from database.models.list import List
 import utils.validators as v
+from routes.todo import extract_todo
 
 
 def listRoutes(app: Bottle):
@@ -14,7 +15,7 @@ def listRoutes(app: Bottle):
             'id': list.id,
             'name': list.name,
             'user_id': list.user_id,
-            'todos': list.todos
+            'todos': [extract_todo(todo) for todo in list.todos]
         }
 
     @app.get('/list/all')
