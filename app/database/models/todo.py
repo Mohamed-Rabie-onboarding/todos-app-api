@@ -17,6 +17,15 @@ class Todo(Base):
     list_id = Column(Integer, ForeignKey('lists.id'))
     items = relationship('TodoItem', cascade="all,delete")
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'description': self.description,
+            'list_id': self.list_id,
+            'items': [(item) for item in self.items],
+            'created_at': self.created_at.isoformat()
+        }
+
 
 class TodoItem(Base):
     __tablename__ = 'items'
@@ -30,3 +39,13 @@ class TodoItem(Base):
     # relations
     user_id = Column(Integer, ForeignKey('users.id'))
     todo_id = Column(Integer, ForeignKey('todos.id'))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'body': self.body,
+            'done': self.done,
+            'todo_id': self.todo_id,
+            'user_id': self.user_id,
+            'created_at': self.created_at.isoformat()
+        }

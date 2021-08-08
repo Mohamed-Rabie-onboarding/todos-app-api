@@ -12,7 +12,7 @@ def extract_todo(todo: Todo):
         'id': todo.id,
         'description': todo.description,
         'list_id': todo.list_id,
-        'items': todo.items,
+        'items': [extract_todo_item(item) for item in todo.items],
         'created_at': todo.created_at.isoformat()
     }
 

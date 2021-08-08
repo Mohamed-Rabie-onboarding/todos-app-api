@@ -31,7 +31,6 @@ def is_max_length(length: int):
     return next
 
 
-
 def validate_body(fields: dict):
     body: dict = get_body()
     errors = []
