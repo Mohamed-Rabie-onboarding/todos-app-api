@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean
 from database.models.base import Base, IToOrm
 from datetime import datetime
@@ -17,6 +18,7 @@ class TodoItemOrm(Base, IToOrm):
     # relations
     user_id = Column(Integer, ForeignKey('users.id'))
     todo_id = Column(Integer, ForeignKey('todos.id'))
+    collection_id = Column(Integer, ForeignKey('collections.id'))
 
     def to_dict(self):
         return {
@@ -31,6 +33,7 @@ class TodoItemOrm(Base, IToOrm):
 
 class TodoItemModel(BaseModel):
     body: str
+    done: Optional[bool]
 
     def to_orm(self, **kwargs):
         return TodoItemOrm(
@@ -42,9 +45,17 @@ class TodoItemModel(BaseModel):
     def body_validator(cls, value: str):
         return ValidatorHelper('Body', value).is_not_empty().has_min_length(3).has_max_length(400).get_value()
 
+    @validator('done')
+    def done_validator(cls, value: bool):
+        return ValidatorHelper('Done', value).is_bool().get_value()
+
     @staticmethod
-    def factory(body: dict):
+    def factory(body: dict, can_ignore_body=False):
         try:
-            return (TodoItemOrm(**body), None)
+            # temp solution
+            if can_ignore_body and 'body' not in body:
+                body['body'] = 'xxxxx'
+
+            return (TodoItemModel(**body), None)
         except ValidationError as e:
             return (None, ValidatorHelper.format_errors(e))

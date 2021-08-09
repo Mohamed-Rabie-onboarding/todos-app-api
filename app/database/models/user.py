@@ -20,7 +20,7 @@ class UserOrm(Base, IToOrm):
     created_at = Column(Date, default=datetime.now())
 
     # relations
-    lists = relationship('CollectionOrm', cascade="all,delete")
+    collections = relationship('CollectionOrm', cascade="all,delete")
     todos = relationship('TodoOrm', cascade="all,delete")
     todos_items = relationship('TodoItemOrm', cascade="all,delete")
 

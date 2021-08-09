@@ -16,8 +16,7 @@ class TodoOrm(Base, IToOrm):
 
     # relations
     user_id = Column(Integer, ForeignKey('users.id'))
-    list_id = Column(Integer, ForeignKey('collections.id'))
-    items = relationship('TodoItemOrm', cascade="all,delete")
+    collection_id = Column(Integer, ForeignKey('collections.id'))
 
     def to_dict(self):
         return {
@@ -45,6 +44,6 @@ class TodoModel(BaseModel):
     @staticmethod
     def factory(body: dict):
         try:
-            return (TodoOrm(**body), None)
+            return (TodoModel(**body), None)
         except ValidationError as e:
             return (None, ValidatorHelper.format_errors(e))

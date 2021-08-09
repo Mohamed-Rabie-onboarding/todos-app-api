@@ -16,6 +16,12 @@ class ValidatorHelper:
 
         return self
 
+    def is_bool(self):
+        if type(self.value) is not bool:
+            raise ValueError(f'{self.field} must be boolean.')
+
+        return self
+
     def has_min_length(self, n: int):
         if len(self.value) < n:
             raise ValueError(f'{self.field} must be more than {n - 1} chars.')

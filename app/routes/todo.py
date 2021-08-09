@@ -1,119 +1,101 @@
-from bottle import Bottle, debug
-from sqlalchemy.orm.session import Session
-from utils.jwt import get_user_id
-from utils.res import json_res
-import utils.validators as v
-from database.models.todo import Todo, TodoItem
-from utils.error import Error, system_error_item
-
-
-def extract_todo(todo: Todo):
-    return {
-        'id': todo.id,
-        'description': todo.description,
-        'list_id': todo.list_id,
-        'items': [extract_todo_item(item) for item in todo.items],
-        'created_at': todo.created_at.isoformat()
-    }
-
-
-def extract_todo_item(item: TodoItem):
-    return {
-        'id': item.id,
-        'body': item.body,
-        'done': item.done,
-        'todo_id': item.todo_id,
-        'user_id': item.user_id,
-        'created_at': item.created_at.isoformat()
-    }
-
+from bottle import Bottle, request, response
+from utils.decorators import enable_cors, required_auth
+from database.models.todo import TodoModel
+from utils.orm_helper import TodoOrmHelper, CollectionOrmHelper
+from utils.validator_helper import ValidatorHelper
 
 todoRoutes = Bottle()
 
 
-@todoRoutes.post('/todo/add/<list_id>')
-def add_todo_handler(db: Session, list_id):
-    id = get_user_id()
-    body = v.validate_body({
-        'description': v.is_max_length(400)
-    })
+@todoRoutes.get('/<id:int>')
+@enable_cors
+@required_auth
+def get_todo_handler(user_id: int, id: int):
+    todo = TodoOrmHelper.get_todo(id, user_id)
 
-    todo = Todo(
-        description=body['description'],
-        list_id=list_id,
-        user_id=id
-    )
+    if todo is None:
+        response.status = 404
+        return ValidatorHelper.create_error('Server', 'Todo not found.')
 
-    db.add(todo)
-    db.commit()
-
-    return json_res(data=extract_todo(todo))
+    response.status = 200
+    return todo.to_dict()
 
 
-@todoRoutes.put('/todo/update/<todo_id>')
-def update_todo_handler(db: Session, todo_id):
-    id = get_user_id()
-    body = v.validate_body({
-        'description': v.is_max_length(400)
-    })
-
-    todo = db.query(Todo).filter_by(id=todo_id, user_id=id).first()
-
-    if todo == None:
-        raise Error([system_error_item('Todo is not found.')])
-
-    todo.description = body['description']
-    db.commit()
-
-    return json_res(data={
-        'message': 'Successfully updated todo.'
-    })
+@todoRoutes.get('/')
+@enable_cors
+@required_auth
+def get_todos_handler(user_id: int):
+    response.status = 200
+    return {
+        'todos': [
+            t.to_dict() for t in TodoOrmHelper.get_user_todos(user_id)
+        ]
+    }
 
 
-@todoRoutes.delete('/todo/delete/<todo_id>')
-def delete_todo_handler(db: Session, todo_id):
-    id = get_user_id()
+@todoRoutes.get('/<collection_id:int>')
+@enable_cors
+@required_auth
+def get_collection_todos_handler(user_id: int, collection_id: int):
+    collection = CollectionOrmHelper.get_collection(collection_id, user_id)
 
-    affectedRows = db.query(Todo).filter_by(
-        id=todo_id,
-        user_id=id
-    ).delete()
+    if collection is None:
+        response.status = 404
+        return ValidatorHelper.create_error('Sever', 'Collection not found.')
 
-    if affectedRows == 0:
-        raise Error([system_error_item('Todo is not found.')])
-
-    return json_res(data={
-        'message': 'Successfully removed todo.'
-    })
-
-
-@todoRoutes.post('/todo/item/add/<todo_id>')
-def add_todo_item_handler(db: Session, todo_id):
-    id = get_user_id()
-    body = v.validate_body({
-        'body': v.is_max_length(500)
-    })
-
-    item = TodoItem(body=body['body'], user_id=id, todo_id=todo_id)
-
-    db.add(item)
-    db.commit()
-
-    return json_res(data=extract_todo_item(item))
+    response.status = 200
+    return {
+        'todos': [
+            t.to_dict() for t in collection.todos
+        ]
+    }
 
 
-@todoRoutes.delete('/todo/item/delete/<item_id>')
-def delete_todo_item_handler(db: Session, item_id):
-    id = get_user_id()
+@todoRoutes.post('/<collection_id:int>')
+@enable_cors
+@required_auth
+def create_todo_handler(user_id: int, collection_id: int):
+    todo, errors = TodoModel.factory(request.json)
 
-    affectedRows = db.query(TodoItem).filter_by(
-        id=item_id,
-        user_id=id
-    ).delete()
+    if errors is not None:
+        response.status = 400
+        return errors
 
-    if affectedRows == 0:
-        raise Error([system_error_item('Todo Item is not found.')])
+    db_todo = todo.to_orm(user_id=user_id, collection_id=collection_id)
+    TodoOrmHelper.create_todo(db_todo)
 
-    return json_res(data={
-        'message': 'Successfully removed todo Item.'
-    })
+    response.status = 201
+
+
+@todoRoutes.put('/<todo_id:int>')
+@enable_cors
+@required_auth
+def update_todo_handler(user_id: int, todo_id: int):
+    todo, errors = TodoModel.factory(request.json)
+
+    if errors is not None:
+        response.status = 400
+        return errors
+
+    db_todo = TodoOrmHelper.get_todo(todo_id, user_id)
+
+    if db_todo is None:
+        response.status = 404
+        return ValidatorHelper.create_error('Sever', 'Todo not found.')
+
+    TodoOrmHelper.update_todo(db_todo, todo.description)
+
+    response.status = 204
+
+
+@todoRoutes.delete('/<todo_id:int>')
+@enable_cors
+@required_auth
+def delete_todo_handler(user_id: int, todo_id: int):
+    removed = TodoOrmHelper.remove_todo(todo_id, user_id)
+
+    if not removed:
+        response.status = 404
+        return ValidatorHelper.create_error('Sever', 'Todo not found.')
+
+    response.status = 204

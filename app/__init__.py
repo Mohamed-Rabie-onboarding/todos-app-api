@@ -16,12 +16,14 @@ def main():
     # import & register routes
     from routes.user import userRoutes
     from routes.collection import collectionRoutes
-    # from routes.todo import todoRoutes
+    from routes.todo import todoRoutes
+    from routes.todo_item import todoItemRoutes
     from routes.error import errorRoutes
 
     app.mount('/api/v1/user', userRoutes)
     app.mount('/api/v1/collection', collectionRoutes)
-    # app.mount('/api/v1/todo', todoRoutes)
+    app.mount('/api/v1/todo', todoRoutes)
+    app.mount('/api/v1/todo-item', todoItemRoutes)
     app.merge(errorRoutes)
 
     # run the app
