@@ -1,6 +1,6 @@
 from bottle import Bottle, request, response
 from utils.decorators import enable_cors, required_auth
-from utils.orm_helper import TodoItemOrmHelper, TodoOrmHelper, CollectionOrmHelper
+from utils.orm_helper import TodoItemOrmHelper
 from utils.validator_helper import ValidatorHelper
 from database.models.todo_item import TodoItemModel
 
@@ -30,49 +30,6 @@ def get_items_handler(user_id: int):
         'items': [
             t.to_dict() for t in TodoItemOrmHelper.get_user_todo_items(user_id)
         ]
-    }
-
-
-@todoItemRoutes.get('/<todo_id:int>')
-@enable_cors
-@required_auth
-def get_todo_items_handler(user_id: int, todo_id: int):
-    todo = TodoOrmHelper.get_todo(todo_id, user_id)
-
-    if todo is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Sever', 'Todo not found.')
-
-    response.status = 200
-    return {
-        'items': [
-            item.to_dict() for item in todo.items
-        ]
-    }
-
-
-@todoItemRoutes.get('/<collection_id:int>')
-@enable_cors
-@required_auth
-def get_collection_items_handler(user_id: int, collection_id: int):
-    collection = CollectionOrmHelper.get_collection(collection_id, user_id)
-
-    if collection is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Sever', 'Collection not found.')
-
-    response.status = 200
-
-    items = []
-    for todo in collection.todos:
-        for item in todo.items:
-            items.append(item.to_dict())
-
-    # for loop more readable
-    # [item for item in (todo.items for todo in collection.todos)]
-
-    return {
-        'items': items
     }
 
 

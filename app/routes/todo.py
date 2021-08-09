@@ -1,7 +1,7 @@
 from bottle import Bottle, request, response
 from utils.decorators import enable_cors, required_auth
 from database.models.todo import TodoModel
-from utils.orm_helper import TodoOrmHelper, CollectionOrmHelper
+from utils.orm_helper import TodoOrmHelper
 from utils.validator_helper import ValidatorHelper
 
 todoRoutes = Bottle()
@@ -33,20 +33,20 @@ def get_todos_handler(user_id: int):
     }
 
 
-@todoRoutes.get('/<collection_id:int>')
+@todoRoutes.get('/<id:int>/items')
 @enable_cors
 @required_auth
-def get_collection_todos_handler(user_id: int, collection_id: int):
-    collection = CollectionOrmHelper.get_collection(collection_id, user_id)
+def get_todo_items_handler(user_id: int, id: int):
+    todo = TodoOrmHelper.get_todo(id, user_id)
 
-    if collection is None:
+    if todo is None:
         response.status = 404
-        return ValidatorHelper.create_error('Sever', 'Collection not found.')
+        return ValidatorHelper.create_error('Sever', 'Todo not found.')
 
     response.status = 200
     return {
-        'todos': [
-            t.to_dict() for t in collection.todos
+        'items': [
+            item.to_dict() for item in todo.items
         ]
     }
 

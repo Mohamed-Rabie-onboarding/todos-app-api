@@ -34,6 +34,49 @@ def get_collections_handler(user_id: int):
     }
 
 
+@collectionRoutes.get('/<id:int>/todos')
+@enable_cors
+@required_auth
+def get_collection_todos_handler(user_id: int, id: int):
+    collection = CollectionOrmHelper.get_collection(id, user_id)
+
+    if collection is None:
+        response.status = 404
+        return ValidatorHelper.create_error('Sever', 'Collection not found.')
+
+    response.status = 200
+    return {
+        'todos': [
+            t.to_dict() for t in collection.todos
+        ]
+    }
+
+
+@collectionRoutes.get('/<id:int>/items')
+@enable_cors
+@required_auth
+def get_collection_items_handler(user_id: int, id: int):
+    collection = CollectionOrmHelper.get_collection(id, user_id)
+
+    if collection is None:
+        response.status = 404
+        return ValidatorHelper.create_error('Sever', 'Collection not found.')
+
+    response.status = 200
+
+    items = []
+    for todo in collection.todos:
+        for item in todo.items:
+            items.append(item.to_dict())
+
+    # for loop more readable
+    # [item for item in (todo.items for todo in collection.todos)]
+
+    return {
+        'items': items
+    }
+
+
 @collectionRoutes.post('/')
 @enable_cors
 @required_auth
