@@ -1,15 +1,9 @@
-from utils.error import Error, error_item
 from bottle import Bottle, request, response
-from database.models.user import UserModel, UserOrm
-import utils.validators as v
-from utils.res import json_res
-from sqlalchemy.orm.session import Session
-from sqlalchemy.exc import IntegrityError
-from pymysql.err import IntegrityError as IE2
-from utils.jwt import sign_token, get_user_id
-from utils.decorators import inject_db, enable_cors
+from database.models.user import UserModel
+from utils.jwt_helper import JwtHelper
+from utils.decorators import enable_cors, required_auth
 from utils.validator_helper import ValidatorHelper
-from utils.orm_helper import OrmHelper
+from utils.orm_helper import UserOrmHelper
 
 
 userRoutes = Bottle()
@@ -17,19 +11,18 @@ userRoutes = Bottle()
 
 @userRoutes.post('/')
 @enable_cors
-@inject_db
-def create_user_handler(db: Session):
+def create_user_handler():
     user, errors = UserModel.factory(request.json)
 
     if errors is not None:
         response.status = 400
         return errors
 
-    if OrmHelper.is_user_exist(db, email=user.email):
+    if UserOrmHelper.is_user_exist(email=user.email):
         response.status = 409
-        return ValidatorHelper.duplicated_email_error()
+        return ValidatorHelper.create_error('email', 'Email is duplicated.')
 
-    OrmHelper.create_user(user)
+    UserOrmHelper.create_user(user)
 
     response.status = 201
     return {
@@ -39,40 +32,29 @@ def create_user_handler(db: Session):
 
 @userRoutes.post('/authenticate')
 @enable_cors
-@inject_db
-def authenticate_user_handler(db: Session):
-    user, errors = UserModel.factory(request.json)
+def authenticate_user_handler():
+    user, errors = UserModel.factory(request.json, username=False)
 
     if errors is not None:
         response.status = 400
         return errors
 
-    # user = db.query(User).filter_by(email=body['email']).first()
+    db_user = UserOrmHelper.get_user(email=user.email)
 
-    # if user is None:
-    #     raise Error([error_item('email', 'Email doesn\'t exist.')])
+    if db_user is None or not user.password_matched(db_user.password):
+        response.status = 401
+        return ValidatorHelper.create_error('email', 'Email and password do not match.')
 
-    # # validate password hash
-    # if bcrypt.checkpw(body['password'].encode('utf-8'), user.password.encode('utf-8')) == False:
-    #     raise Error([error_item('password', 'Password doesn\'t match.')])
+    response.status = 201
+    return db_user.to_dict(
+        JwtHelper.sign(db_user.id)
+    )
 
-    # # generate jwt for 1 week (for now)
-    # token = sign_token(user.id)
 
-    # return json_res(data={
-    #     'id': user.id,
-    #     'username': user.username,
-    #     'picture': user.picture,
-    #     'token': token,
-    # })
+@userRoutes.get('/')
+@enable_cors
+@required_auth
+def get_current_user_handler(id: int):
+    db_user = UserOrmHelper.get_user(id=id)
 
-    # @userRoutes.get('/me')
-    # def me_handler(db: Session):
-    #     id = get_user_id()
-    #     user = db.query(User).filter_by(id=id).first()
-
-    #     return json_res(data={
-    #         'id': user.id,
-    #         'username': user.username,
-    #         'picture': user.picture,
-    #     })
+    return db_user.to_dict()

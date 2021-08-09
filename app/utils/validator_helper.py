@@ -50,12 +50,12 @@ class ValidatorHelper:
         return {'errors': errors}
 
     @staticmethod
-    def duplicated_email_error():
+    def create_error(field: str, message: str):
         return {
             'errors': [
                 {
-                    'field': 'email',
-                    'message': 'Email is duplicated.'
+                    'field': field,
+                    'message': message
                 }
             ]
         }

@@ -1,5 +1,7 @@
+from utils.validator_helper import ValidatorHelper
 from bottle import request, response
 from database.db import db_session
+from utils.jwt_helper import JwtHelper
 
 
 def inject_db(fn):
@@ -7,6 +9,23 @@ def inject_db(fn):
         return fn(db_session, *args, **kwargs)
 
     return _inject_db
+
+
+def required_auth(fn):
+    def _get_user_id(*args, **kwargs):
+        try:
+            bearer: str = request.get_header('Authorization')
+            token = bearer[len('bearer ')::]
+            payload = JwtHelper.verify(token)
+            return fn(payload.get('id'), *args, **kwargs)
+        except Exception:
+            response.status = 401
+            return ValidatorHelper.create_error(
+                'System',
+                'Unauthorized to make this request.'
+            )
+
+    return _get_user_id
 
 
 def enable_cors(fn):

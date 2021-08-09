@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship
 from database.models.base import Base, IToOrm
@@ -35,21 +36,26 @@ class UserOrm(Base, IToOrm):
 
 
 class UserModel(BaseModel):
+
     username: str
     email: str
     password: str
+    __include__: bool
 
-    def to_orm(self, username=True):
+    def to_orm(self):
         hash_password = bcrypt.hashpw(
             self.password.encode('utf-8'),
             bcrypt.gensalt(12)
         )
 
         return UserOrm(
-            username=self.username if username else None,
+            username=self.username if self.__include__ else None,
             email=self.email,
             password=hash_password
         )
+
+    def password_matched(self, hash: str):
+        return bcrypt.checkpw(self.password.encode('utf-8'), hash.encode('utf-8'))
 
     @validator('username')
     def username_validator(cls, value: str):
@@ -64,8 +70,14 @@ class UserModel(BaseModel):
         return ValidatorHelper('Password', value).is_not_empty().has_min_length(6).has_max_length(80).get_value()
 
     @staticmethod
-    def factory(body: dict):
+    def factory(body: dict, username=True):
         try:
+
+            # temp solution
+            body['__include__'] = username
+            if not username:
+                body['username'] = 'xxxxxxxxx'
+
             return (UserModel(**body), None)
         except ValidationError as e:
             return (None, ValidatorHelper.format_errors(e))
