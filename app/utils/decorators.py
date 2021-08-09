@@ -1,14 +1,6 @@
 from utils.validator_helper import ValidatorHelper
 from bottle import request, response
-from database.db import db_session
 from utils.jwt_helper import JwtHelper
-
-
-def inject_db(fn):
-    def _inject_db(*args, **kwargs):
-        return fn(db_session, *args, **kwargs)
-
-    return _inject_db
 
 
 def required_auth(fn):
