@@ -1,14 +1,14 @@
 from utils.error import Error, error_item
-from bottle import Bottle, request
+from bottle import Bottle, request, response
 from database.models.user import UserModel, UserOrm
 import utils.validators as v
 from utils.res import json_res
 from sqlalchemy.orm.session import Session
 from sqlalchemy.exc import IntegrityError
 from pymysql.err import IntegrityError as IE2
-import bcrypt
 from utils.jwt import sign_token, get_user_id
 from utils.decorators import inject_db, enable_cors
+from utils.validator_helper import ValidatorValueHelper
 
 
 userRoutes = Bottle()
@@ -18,38 +18,29 @@ userRoutes = Bottle()
 @enable_cors
 @inject_db
 def register_handler(db: Session):
-    print(type(db))
-    # print('db', db)
-    user = UserModel.factory(request.json)
+    user, errors = UserModel.factory(request.json)
 
-    # body = v.validate_body({
-    #     'username': v.is_min_length(2),
-    #     'email': v.is_email,
-    #     'password': v.is_min_length(6)
-    # })
+    if errors is not None:
+        response.status = 400
+        return errors
 
-    # # user should be valid here
-    # user = UserOrm(
-    #     username=body['username'],
-    #     email=body['email'],
-    #     password=bcrypt.hashpw(
-    #         body['password'].encode('utf-8'),
-    #         bcrypt.gensalt(12)
-    #     )
-    # )
+    exist, error = ValidatorValueHelper.is_email_duplicated(
+        db,
+        UserOrm,
+        user.email
+    )
 
-    # try:
-    #     db.add(user)
-    #     db.commit()
-    # except IntegrityError as e:
-    #     x: IE2 = e.orig
-    #     (state, _) = x.args
-    #     if state == 1062:
-    #         raise Error([error_item('email', 'Email is duplicated.')])
-    #     else:
-    #         raise e
+    if exist:
+        response.status = 409
+        return error
 
-    return json_res(data={'message': 'Successfully added new user!'})
+    db.add(user)
+    db.commit()
+
+    response.status = 201
+    return {
+        'message': 'User created!'
+    }
 
 
 # @userRoutes.post('/login')

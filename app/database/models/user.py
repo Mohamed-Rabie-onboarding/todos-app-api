@@ -67,7 +67,6 @@ class UserModel(BaseModel):
     def factory(body: dict):
         try:
             user = UserModel(**body)
-            return user.to_orm()
+            return (user.to_orm(), None)
         except ValidationError as e:
-            print(e.json())
-            return e.json()
+            return (None, ValidatorValueHelper.format_errors(e))
