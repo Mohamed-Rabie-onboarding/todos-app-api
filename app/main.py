@@ -18,6 +18,7 @@ def create_app_instance():
 
 
 if __name__ == '__main__':
+    print(bool(os.getenv('DEV')) == True)
     # get app instance
     app = create_app_instance()
 

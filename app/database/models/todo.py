@@ -14,7 +14,7 @@ class Todo(Base):
 
     # relations
     user_id = Column(Integer, ForeignKey('users.id'))
-    list_id = Column(Integer, ForeignKey('lists.id'))
+    list_id = Column(Integer, ForeignKey('collections.id'))
     items = relationship('TodoItem', cascade="all,delete")
 
     def to_dict(self):

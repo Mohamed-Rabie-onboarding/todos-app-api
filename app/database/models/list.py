@@ -4,8 +4,8 @@ from database.models.base import Base
 from datetime import datetime
 
 
-class List(Base):
-    __tablename__ = 'lists'
+class Collection(Base):
+    __tablename__ = 'collections'
 
     # table columns
     id = Column(Integer, primary_key=True)
@@ -15,3 +15,11 @@ class List(Base):
     # relations
     user_id = Column(Integer, ForeignKey('users.id'))
     todos = relationship('Todo', cascade="all,delete")
+
+    def toDict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'user_id': self.user_id,
+            'todos': [todo.toDict() for todo in self.todos]
+        }

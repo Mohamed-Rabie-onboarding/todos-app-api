@@ -1,1 +1,1 @@
-poetry run python3.9 app/main.py
+DEV=True poetry run python3.9 app/main.py

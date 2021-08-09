@@ -16,6 +16,18 @@ class User(Base):
     created_at = Column(Date, default=datetime.now())
 
     # relations
-    lists = relationship('List', cascade="all,delete")
+    lists = relationship('Collection', cascade="all,delete")
     todos = relationship('Todo', cascade="all,delete")
     todos_items = relationship('TodoItem', cascade="all,delete")
+
+    def toDict(self, token):
+        user = {
+            'id': self.id,
+            'username': self.username,
+            'picture': self.picture,
+        }
+
+        if token is not None:
+            user['token'] = token
+
+        return user
