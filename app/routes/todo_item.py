@@ -66,7 +66,7 @@ def get_collection_items_handler(user_id: int, collection_id: int):
     items = []
     for todo in collection.todos:
         for item in todo.items:
-            items.append(item)
+            items.append(item.to_dict())
 
     # for loop more readable
     # [item for item in (todo.items for todo in collection.todos)]
