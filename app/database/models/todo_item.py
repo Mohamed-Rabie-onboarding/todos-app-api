@@ -1,11 +1,11 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean
-from database.models.base import Base
+from database.models.base import Base, IToOrm
 from datetime import datetime
 from pydantic import BaseModel, validator, ValidationError
-from utils.validator_helper import ValidatorValueHelper
+from utils.validator_helper import ValidatorHelper
 
 
-class TodoItemOrm(Base):
+class TodoItemOrm(Base, IToOrm):
     __tablename__ = 'items'
 
     # table columns
@@ -39,7 +39,7 @@ class TodoItemModel(BaseModel):
 
     @validator('body')
     def body_validator(cls, value: str):
-        return ValidatorValueHelper('Body', value).is_not_empty().has_min_length(3).has_max_length(400).get_value()
+        return ValidatorHelper('Body', value).is_not_empty().has_min_length(3).has_max_length(400).get_value()
 
     @staticmethod
     def factory(body: dict):

@@ -8,7 +8,8 @@ from sqlalchemy.exc import IntegrityError
 from pymysql.err import IntegrityError as IE2
 from utils.jwt import sign_token, get_user_id
 from utils.decorators import inject_db, enable_cors
-from utils.validator_helper import ValidatorValueHelper
+from utils.validator_helper import ValidatorHelper
+from utils.orm_helper import OrmHelper
 
 
 userRoutes = Bottle()
@@ -17,25 +18,18 @@ userRoutes = Bottle()
 @userRoutes.post('/')
 @enable_cors
 @inject_db
-def register_handler(db: Session):
+def create_user_handler(db: Session):
     user, errors = UserModel.factory(request.json)
 
     if errors is not None:
         response.status = 400
         return errors
 
-    exist, error = ValidatorValueHelper.is_email_duplicated(
-        db,
-        UserOrm,
-        user.email
-    )
-
-    if exist:
+    if OrmHelper.is_user_exist(db, email=user.email):
         response.status = 409
-        return error
+        return ValidatorHelper.duplicated_email_error()
 
-    db.add(user)
-    db.commit()
+    OrmHelper.create_user(user)
 
     response.status = 201
     return {
@@ -43,40 +37,42 @@ def register_handler(db: Session):
     }
 
 
-# @userRoutes.post('/login')
-# def login_handler(db: Session):
-#     body = v.validate_body({
-#         'email': v.is_email,
-#         'password': v.is_min_length(6)
-#     })
+@userRoutes.post('/authenticate')
+@enable_cors
+@inject_db
+def authenticate_user_handler(db: Session):
+    user, errors = UserModel.factory(request.json)
 
-#     user = db.query(User).filter_by(email=body['email']).first()
+    if errors is not None:
+        response.status = 400
+        return errors
 
-#     if user is None:
-#         raise Error([error_item('email', 'Email doesn\'t exist.')])
+    # user = db.query(User).filter_by(email=body['email']).first()
 
-#     # validate password hash
-#     if bcrypt.checkpw(body['password'].encode('utf-8'), user.password.encode('utf-8')) == False:
-#         raise Error([error_item('password', 'Password doesn\'t match.')])
+    # if user is None:
+    #     raise Error([error_item('email', 'Email doesn\'t exist.')])
 
-#     # generate jwt for 1 week (for now)
-#     token = sign_token(user.id)
+    # # validate password hash
+    # if bcrypt.checkpw(body['password'].encode('utf-8'), user.password.encode('utf-8')) == False:
+    #     raise Error([error_item('password', 'Password doesn\'t match.')])
 
-#     return json_res(data={
-#         'id': user.id,
-#         'username': user.username,
-#         'picture': user.picture,
-#         'token': token,
-#     })
+    # # generate jwt for 1 week (for now)
+    # token = sign_token(user.id)
 
+    # return json_res(data={
+    #     'id': user.id,
+    #     'username': user.username,
+    #     'picture': user.picture,
+    #     'token': token,
+    # })
 
-# @userRoutes.get('/me')
-# def me_handler(db: Session):
-#     id = get_user_id()
-#     user = db.query(User).filter_by(id=id).first()
+    # @userRoutes.get('/me')
+    # def me_handler(db: Session):
+    #     id = get_user_id()
+    #     user = db.query(User).filter_by(id=id).first()
 
-#     return json_res(data={
-#         'id': user.id,
-#         'username': user.username,
-#         'picture': user.picture,
-#     })
+    #     return json_res(data={
+    #         'id': user.id,
+    #         'username': user.username,
+    #         'picture': user.picture,
+    #     })

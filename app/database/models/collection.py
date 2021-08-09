@@ -1,12 +1,12 @@
 from sqlalchemy import Column, Integer, Date, ForeignKey, String
 from sqlalchemy.orm import relationship
-from database.models.base import Base
+from database.models.base import Base, IToOrm
 from datetime import datetime
 from pydantic import BaseModel, validator, ValidationError
-from utils.validator_helper import ValidatorValueHelper
+from utils.validator_helper import ValidatorHelper
 
 
-class CollectionOrm(Base):
+class CollectionOrm(Base, IToOrm):
     __tablename__ = 'collections'
 
     # table columns
@@ -38,7 +38,7 @@ class CollectionModel(BaseModel):
 
     @validator('title')
     def title_validator(cls, value: str):
-        return ValidatorValueHelper('Title', value).is_not_empty().has_min_length(3).has_max_length(100).get_value()
+        return ValidatorHelper('Title', value).is_not_empty().has_min_length(3).has_max_length(100).get_value()
 
     @staticmethod
     def factory(body: dict):

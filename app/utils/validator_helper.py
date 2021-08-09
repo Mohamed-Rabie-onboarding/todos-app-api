@@ -1,9 +1,8 @@
 from pydantic import validate_email
 from pydantic import ValidationError
-from sqlalchemy.orm.session import Session
 
 
-class ValidatorValueHelper:
+class ValidatorHelper:
     field: str
     value: str
 
@@ -51,17 +50,12 @@ class ValidatorValueHelper:
         return {'errors': errors}
 
     @staticmethod
-    def is_email_duplicated(db: Session, orm, email: str):
-        q = db.query(orm).filter_by(email=email)
-        check = db.query(q.exists())
-        return (
-            check.scalar(),
-            {
-                'errors': [
-                    {
-                        'field': 'email',
-                        'message': 'Email is duplicated.'
-                    }
-                ]
-            }
-        )
+    def duplicated_email_error():
+        return {
+            'errors': [
+                {
+                    'field': 'email',
+                    'message': 'Email is duplicated.'
+                }
+            ]
+        }
