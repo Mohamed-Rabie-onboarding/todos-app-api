@@ -31,9 +31,10 @@ class CollectionOrm(Base, IToOrm):
 class CollectionModel(BaseModel):
     title: str
 
-    def to_orm(self):
+    def to_orm(self, **kwargs):
         return CollectionOrm(
-            title=self.title
+            title=self.title,
+            **kwargs
         )
 
     @validator('title')
@@ -43,8 +44,6 @@ class CollectionModel(BaseModel):
     @staticmethod
     def factory(body: dict):
         try:
-            collection = CollectionModel(**body)
-            return collection.to_orm()
+            return (CollectionModel(**body), None)
         except ValidationError as e:
-            print(e.json())
-            return e.json()
+            return (None, ValidatorHelper.format_errors(e))

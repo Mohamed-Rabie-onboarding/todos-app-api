@@ -32,9 +32,10 @@ class TodoOrm(Base, IToOrm):
 class TodoModel(BaseModel):
     description: str
 
-    def to_orm(self):
+    def to_orm(self, **kwargs):
         return TodoOrm(
-            description=self.description
+            description=self.description,
+            **kwargs
         )
 
     @validator('description')
@@ -44,8 +45,6 @@ class TodoModel(BaseModel):
     @staticmethod
     def factory(body: dict):
         try:
-            todo = TodoOrm(**body)
-            return todo.to_orm()
+            return (TodoOrm(**body), None)
         except ValidationError as e:
-            print(e.json())
-            return e.json()
+            return (None, ValidatorHelper.format_errors(e))

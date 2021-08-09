@@ -42,16 +42,17 @@ class UserModel(BaseModel):
     password: str
     __include__: bool
 
-    def to_orm(self):
+    def to_orm(self, **kwargs):
         hash_password = bcrypt.hashpw(
             self.password.encode('utf-8'),
-            bcrypt.gensalt(12)
+            bcrypt.gensalt(12),
         )
 
         return UserOrm(
             username=self.username if self.__include__ else None,
             email=self.email,
-            password=hash_password
+            password=hash_password,
+            **kwargs
         )
 
     def password_matched(self, hash: str):
