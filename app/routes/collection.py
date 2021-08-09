@@ -1,77 +1,72 @@
-from utils.error import Error, system_error_item
-from utils.res import json_res
-from utils.jwt import get_user_id
-from bottle import Bottle
+from bottle import Bottle, request, response
+from utils.decorators import enable_cors, required_auth, inject_db
+from utils.orm_helper import CollectionOrmHelper
+from database.models.collection import CollectionModel
+from utils.validator_helper import ValidatorHelper
 from sqlalchemy.orm.session import Session
-from database.models.list import List
-import utils.validators as v
-from routes.todo import extract_todo
 
 
 collectionRoutes = Bottle()
 
 
-def extractList(list: List):
+@collectionRoutes.get('/')
+@enable_cors
+@required_auth
+def get_user_collections_handler(user_id: int):
+    response.status = 200
     return {
-        'id': list.id,
-        'name': list.name,
-        'user_id': list.user_id,
-        'todos': [extract_todo(todo) for todo in list.todos]
+        'collections': [
+            c.to_dict() for c in CollectionOrmHelper.get_user_collections(user_id)
+        ]
     }
 
 
-@collectionRoutes.get('/list/all')
-def get_lists_handler(db: Session):
-    id = get_user_id()
-    lists = db.query(List).filter_by(user_id=id).all()
-    return json_res(data={'lists': [extractList(list) for list in lists]})
+@collectionRoutes.post('/')
+@enable_cors
+@required_auth
+def create_collection_handler(user_id: int):
+    collection, errors = CollectionModel.factory(request.json)
+
+    if errors is not None:
+        response.status = 400
+        return errors
+
+    db_collection = collection.to_orm(user_id=user_id)
+    CollectionOrmHelper.create_collection(db_collection)
+
+    response.status = 201
+    return db_collection.to_dict()
 
 
-@collectionRoutes.post('/list/add')
-def add_handler(db: Session):
-    id = get_user_id()
-    body = v.validate_body({
-        'name': v.is_min_length(1)
-    })
+@collectionRoutes.delete('/<id:int>')
+@enable_cors
+@required_auth
+def delete_collection_handler(user_id: int, id: int):
+    removed = CollectionOrmHelper.remove_collection(id, user_id)
 
-    list = List(name=body['name'], user_id=id)
+    if not removed:
+        response.status = 404
+        return ValidatorHelper.create_error('Sever', 'Collection not found.')
 
-    # if something went wrong an error
-    # from internal_server_error should occur by default
-    db.add(list)
-    db.commit()
-
-    return json_res(data=extractList(list))
+    response.status = 204
 
 
-@collectionRoutes.delete('/list/<list_id>')
-def delete_handler(db: Session, list_id):
-    id = get_user_id()
+@collectionRoutes.put('/<id:int>')
+@enable_cors
+@required_auth
+def update_collection_handler(user_id: int, id: int):
+    collection, errors = CollectionModel.factory(request.json)
 
-    affectedRows = db.query(List).filter_by(
-        id=list_id, user_id=id).delete()
+    if errors is not None:
+        response.status = 400
+        return errors
 
-    if affectedRows == 0:
-        raise Error([system_error_item('List not found.')])
+    db_collection = CollectionOrmHelper.get_collection(id, user_id)
 
-    return json_res(data={
-        'message': 'Successfully remove list.'
-    })
+    if db_collection is None:
+        response.status = 404
+        return ValidatorHelper.create_error('Server', 'Collection not found.')
 
+    CollectionOrmHelper.update_collection(db_collection, collection.title)
 
-@collectionRoutes.put('/list/<list_id>')
-def update_list_handler(db: Session, list_id):
-    id = get_user_id()
-    body = v.validate_body({
-        'name': v.is_min_length(1)
-    })
-
-    list = db.query(List).filter_by(id=list_id, user_id=id).first()
-
-    if list == None:
-        raise Error([system_error_item('List is not found.')])
-
-    list.name = body['name']
-    db.commit()
-
-    return json_res(data={'message': 'Successfully updated list.'})
+    response.status = 204

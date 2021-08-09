@@ -18,10 +18,10 @@ def required_auth(fn):
             token = bearer[len('bearer ')::]
             payload = JwtHelper.verify(token)
             return fn(payload.get('id'), *args, **kwargs)
-        except Exception:
+        except Exception as e:
             response.status = 401
             return ValidatorHelper.create_error(
-                'System',
+                'Server',
                 'Unauthorized to make this request.'
             )
 

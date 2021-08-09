@@ -36,11 +36,12 @@ class UserOrm(Base, IToOrm):
 
 
 class UserModel(BaseModel):
+    # metadata
+    include_username: bool
 
     username: str
     email: str
     password: str
-    __include__: bool
 
     def to_orm(self, **kwargs):
         hash_password = bcrypt.hashpw(
@@ -49,7 +50,7 @@ class UserModel(BaseModel):
         )
 
         return UserOrm(
-            username=self.username if self.__include__ else None,
+            username=self.username if self.include_username else None,
             email=self.email,
             password=hash_password,
             **kwargs
@@ -75,7 +76,7 @@ class UserModel(BaseModel):
         try:
 
             # temp solution
-            body['__include__'] = username
+            body['include_username'] = username
             if not username:
                 body['username'] = 'xxxxxxxxx'
 

@@ -25,9 +25,6 @@ def create_user_handler():
     UserOrmHelper.create_user(user)
 
     response.status = 201
-    return {
-        'message': 'User created!'
-    }
 
 
 @userRoutes.post('/authenticate')
@@ -54,7 +51,8 @@ def authenticate_user_handler():
 @userRoutes.get('/')
 @enable_cors
 @required_auth
-def get_current_user_handler(id: int):
-    db_user = UserOrmHelper.get_user(id=id)
+def get_current_user_handler(user_id: int):
+    db_user = UserOrmHelper.get_user(id=user_id)
 
+    response.status = 200
     return db_user.to_dict()
