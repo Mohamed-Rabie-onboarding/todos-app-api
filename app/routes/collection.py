@@ -1,9 +1,8 @@
 from bottle import Bottle, request, response
-from utils.decorators import enable_cors, required_auth, inject_db
+from utils.decorators import enable_cors, required_auth
 from utils.orm_helper import CollectionOrmHelper
 from database.models.collection import CollectionModel
 from utils.validator_helper import ValidatorHelper
-from sqlalchemy.orm.session import Session
 
 
 collectionRoutes = Bottle()

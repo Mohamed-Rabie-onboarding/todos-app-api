@@ -1,6 +1,5 @@
 from bottle import Bottle, request, response
 from utils.decorators import enable_cors, required_auth
-from database.models.todo import TodoModel
 from utils.orm_helper import TodoItemOrmHelper, TodoOrmHelper, CollectionOrmHelper
 from utils.validator_helper import ValidatorHelper
 from database.models.todo_item import TodoItemModel

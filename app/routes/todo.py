@@ -67,17 +67,17 @@ def create_todo_handler(user_id: int, collection_id: int):
     response.status = 201
 
 
-@todoRoutes.put('/<todo_id:int>')
+@todoRoutes.put('/<id:int>')
 @enable_cors
 @required_auth
-def update_todo_handler(user_id: int, todo_id: int):
+def update_todo_handler(user_id: int, id: int):
     todo, errors = TodoModel.factory(request.json)
 
     if errors is not None:
         response.status = 400
         return errors
 
-    db_todo = TodoOrmHelper.get_todo(todo_id, user_id)
+    db_todo = TodoOrmHelper.get_todo(id, user_id)
 
     if db_todo is None:
         response.status = 404
@@ -88,11 +88,11 @@ def update_todo_handler(user_id: int, todo_id: int):
     response.status = 204
 
 
-@todoRoutes.delete('/<todo_id:int>')
+@todoRoutes.delete('/<id:int>')
 @enable_cors
 @required_auth
-def delete_todo_handler(user_id: int, todo_id: int):
-    removed = TodoOrmHelper.remove_todo(todo_id, user_id)
+def delete_todo_handler(user_id: int, id: int):
+    removed = TodoOrmHelper.remove_todo(id, user_id)
 
     if not removed:
         response.status = 404
