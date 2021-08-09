@@ -10,8 +10,8 @@ from database.models.user import User
 from database.models.todo import Todo, TodoItem
 
 
-def create_db_plugin():
-    engine = create_engine(os.getenv('DB_URL'))
+def create_db_plugin(uri: str):
+    engine = create_engine(uri)
 
     if not database_exists(engine.url):
         create_database(engine.url)

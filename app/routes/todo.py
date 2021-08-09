@@ -28,87 +28,92 @@ def extract_todo_item(item: TodoItem):
     }
 
 
-def todoRoutes(app: Bottle):
+todoRoutes = Bottle()
 
-    @app.post('/todo/add/<list_id>')
-    def add_todo_handler(db: Session, list_id):
-        id = get_user_id()
-        body = v.validate_body({
-            'description': v.is_max_length(400)
-        })
 
-        todo = Todo(
-            description=body['description'],
-            list_id=list_id,
-            user_id=id
-        )
+@todoRoutes.post('/todo/add/<list_id>')
+def add_todo_handler(db: Session, list_id):
+    id = get_user_id()
+    body = v.validate_body({
+        'description': v.is_max_length(400)
+    })
 
-        db.add(todo)
-        db.commit()
+    todo = Todo(
+        description=body['description'],
+        list_id=list_id,
+        user_id=id
+    )
 
-        return json_res(data=extract_todo(todo))
+    db.add(todo)
+    db.commit()
 
-    @app.put('/todo/update/<todo_id>')
-    def update_todo_handler(db: Session, todo_id):
-        id = get_user_id()
-        body = v.validate_body({
-            'description': v.is_max_length(400)
-        })
+    return json_res(data=extract_todo(todo))
 
-        todo = db.query(Todo).filter_by(id=todo_id, user_id=id).first()
 
-        if todo == None:
-            raise Error([system_error_item('Todo is not found.')])
+@todoRoutes.put('/todo/update/<todo_id>')
+def update_todo_handler(db: Session, todo_id):
+    id = get_user_id()
+    body = v.validate_body({
+        'description': v.is_max_length(400)
+    })
 
-        todo.description = body['description']
-        db.commit()
+    todo = db.query(Todo).filter_by(id=todo_id, user_id=id).first()
 
-        return json_res(data={
-            'message': 'Successfully updated todo.'
-        })
+    if todo == None:
+        raise Error([system_error_item('Todo is not found.')])
 
-    @app.delete('/todo/delete/<todo_id>')
-    def delete_todo_handler(db: Session, todo_id):
-        id = get_user_id()
+    todo.description = body['description']
+    db.commit()
 
-        affectedRows = db.query(Todo).filter_by(
-            id=todo_id,
-            user_id=id
-        ).delete()
+    return json_res(data={
+        'message': 'Successfully updated todo.'
+    })
 
-        if affectedRows == 0:
-            raise Error([system_error_item('Todo is not found.')])
 
-        return json_res(data={
-            'message': 'Successfully removed todo.'
-        })
+@todoRoutes.delete('/todo/delete/<todo_id>')
+def delete_todo_handler(db: Session, todo_id):
+    id = get_user_id()
 
-    @app.post('/todo/item/add/<todo_id>')
-    def add_todo_item_handler(db: Session, todo_id):
-        id = get_user_id()
-        body = v.validate_body({
-            'body': v.is_max_length(500)
-        })
+    affectedRows = db.query(Todo).filter_by(
+        id=todo_id,
+        user_id=id
+    ).delete()
 
-        item = TodoItem(body=body['body'], user_id=id, todo_id=todo_id)
+    if affectedRows == 0:
+        raise Error([system_error_item('Todo is not found.')])
 
-        db.add(item)
-        db.commit()
+    return json_res(data={
+        'message': 'Successfully removed todo.'
+    })
 
-        return json_res(data=extract_todo_item(item))
 
-    @app.delete('/todo/item/delete/<item_id>')
-    def delete_todo_item_handler(db: Session, item_id):
-        id = get_user_id()
+@todoRoutes.post('/todo/item/add/<todo_id>')
+def add_todo_item_handler(db: Session, todo_id):
+    id = get_user_id()
+    body = v.validate_body({
+        'body': v.is_max_length(500)
+    })
 
-        affectedRows = db.query(TodoItem).filter_by(
-            id=item_id,
-            user_id=id
-        ).delete()
+    item = TodoItem(body=body['body'], user_id=id, todo_id=todo_id)
 
-        if affectedRows == 0:
-            raise Error([system_error_item('Todo Item is not found.')])
+    db.add(item)
+    db.commit()
 
-        return json_res(data={
-            'message': 'Successfully removed todo Item.'
-        })
+    return json_res(data=extract_todo_item(item))
+
+
+@todoRoutes.delete('/todo/item/delete/<item_id>')
+def delete_todo_item_handler(db: Session, item_id):
+    id = get_user_id()
+
+    affectedRows = db.query(TodoItem).filter_by(
+        id=item_id,
+        user_id=id
+    ).delete()
+
+    if affectedRows == 0:
+        raise Error([system_error_item('Todo Item is not found.')])
+
+    return json_res(data={
+        'message': 'Successfully removed todo Item.'
+    })
