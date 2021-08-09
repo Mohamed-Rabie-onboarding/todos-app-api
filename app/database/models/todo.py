@@ -1,10 +1,12 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship
 from database.models.base import Base
 from datetime import datetime
+from pydantic import BaseModel, validator, ValidationError
+from utils.validator_helper import ValidatorValueHelper
 
 
-class Todo(Base):
+class TodoOrm(Base):
     __tablename__ = 'todos'
 
     # table columns
@@ -15,37 +17,35 @@ class Todo(Base):
     # relations
     user_id = Column(Integer, ForeignKey('users.id'))
     list_id = Column(Integer, ForeignKey('collections.id'))
-    items = relationship('TodoItem', cascade="all,delete")
+    items = relationship('TodoItemOrm', cascade="all,delete")
 
     def to_dict(self):
         return {
             'id': self.id,
             'description': self.description,
             'list_id': self.list_id,
-            'items': [(item) for item in self.items],
+            'items': [item.to_dict() for item in self.items],
             'created_at': self.created_at.isoformat()
         }
 
 
-class TodoItem(Base):
-    __tablename__ = 'items'
+class TodoModel(BaseModel):
+    description: str
 
-    # table columns
-    id = Column(Integer, primary_key=True)
-    body = Column(String(500), nullable=False)
-    done = Column(Boolean, default=False)
-    created_at = Column(Date, default=datetime.now())
+    def to_orm(self):
+        return TodoOrm(
+            description=self.description
+        )
 
-    # relations
-    user_id = Column(Integer, ForeignKey('users.id'))
-    todo_id = Column(Integer, ForeignKey('todos.id'))
+    @validator('description')
+    def description_validator(cls, value: str):
+        return ValidatorValueHelper('Description', value).is_not_empty().has_min_length(3).has_max_length(400).get_value()
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'body': self.body,
-            'done': self.done,
-            'todo_id': self.todo_id,
-            'user_id': self.user_id,
-            'created_at': self.created_at.isoformat()
-        }
+    @staticmethod
+    def factory(body: dict):
+        try:
+            todo = TodoOrm(**body)
+            return todo.to_orm()
+        except ValidationError as e:
+            print(e.json())
+            return e.json()

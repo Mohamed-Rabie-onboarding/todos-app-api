@@ -5,9 +5,10 @@ from database.models.base import Base
 from sqlalchemy.orm import Session
 
 # import models to be defined
-from database.models.list import Collection
+from database.models.collection import CollectionOrm
 from database.models.user import UserOrm
-from database.models.todo import Todo, TodoItem
+from database.models.todo import TodoOrm
+from database.models.todo_item import TodoItemOrm
 
 
 def create_db_session(uri: str):
@@ -19,22 +20,13 @@ def create_db_session(uri: str):
             engine,
             tables=[
                 UserOrm.__table__,
-                Collection.__table__,
-                Todo.__table__,
-                TodoItem.__table__,
+                CollectionOrm.__table__,
+                TodoOrm.__table__,
+                TodoItemOrm.__table__,
             ],
         )
 
     return Session(engine)
 
 
-__session__: Session = None
-
-
-def get_db_session():
-    global __session__
-
-    if __session__ is None:
-        __session__ = create_db_session(os.getenv('DB_URL'))
-
-    return __session__
+db_session = create_db_session(os.getenv('DB_URL'))

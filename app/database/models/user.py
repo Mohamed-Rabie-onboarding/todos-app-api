@@ -2,9 +2,9 @@ from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship
 from database.models.base import Base
 from datetime import datetime
-from pydantic import BaseModel, validator, ValidationError, validate_email
-from utils.error import is_not_empty
+from pydantic import BaseModel, validator, ValidationError
 import bcrypt
+from utils.validator_helper import ValidatorValueHelper
 
 
 class UserOrm(Base):
@@ -13,17 +13,17 @@ class UserOrm(Base):
     # table columns
     id = Column(Integer, primary_key=True)
     username = Column(String(20), nullable=False)
-    email = Column(String(50), unique=True, nullable=False)
+    email = Column(String(80), unique=True, nullable=False)
     password = Column(String(80), nullable=False)
     picture = Column(String(100), default='http://placehold.it/250x250')
     created_at = Column(Date, default=datetime.now())
 
     # relations
-    lists = relationship('Collection', cascade="all,delete")
-    todos = relationship('Todo', cascade="all,delete")
-    todos_items = relationship('TodoItem', cascade="all,delete")
+    lists = relationship('CollectionOrm', cascade="all,delete")
+    todos = relationship('TodoOrm', cascade="all,delete")
+    todos_items = relationship('TodoItemOrm', cascade="all,delete")
 
-    def dict(self, token=None):
+    def to_dict(self, token=None):
         user = {
             'id': self.id,
             'username': self.username,
@@ -40,35 +40,28 @@ class UserModel(BaseModel):
     password: str
 
     def to_orm(self):
+        hash_password = bcrypt.hashpw(
+            self.password.encode('utf-8'),
+            bcrypt.gensalt(12)
+        )
+
         return UserOrm(
             username=self.username,
             email=self.email,
-            password=bcrypt.hashpw(
-                self.password.encode('utf-8'),
-                bcrypt.gensalt(12)
-            )
+            password=hash_password
         )
 
     @validator('username')
     def username_validator(cls, value: str):
-        value = is_not_empty(value, 'Username')
-        if len(value) < 3:
-            raise ValueError('Username must be more than 2 chars.')
-        return value
+        return ValidatorValueHelper('Username', value).is_not_empty().has_min_length(3).has_max_length(20).get_value()
 
     @validator('email')
     def email_validator(cls, value: str):
-        value = is_not_empty(value, 'Email')
-        if not validate_email(value):
-            raise ValueError('Email is not correct.')
-        return value
+        return ValidatorValueHelper('Email', value).is_not_empty().is_email_format().get_value()
 
     @validator('password')
     def password_validator(cls, value: str):
-        value = is_not_empty(value, 'Password')
-        if len(value) < 6:
-            raise ValueError('Password min length is 6 chars.')
-        return value
+        return ValidatorValueHelper('Password', value).is_not_empty().has_min_length(6).has_max_length(80).get_value()
 
     @staticmethod
     def factory(body: dict):
