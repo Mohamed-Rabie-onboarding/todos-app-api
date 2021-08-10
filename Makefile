@@ -1,5 +1,8 @@
-serve:
-	DEV=True poetry run python3.9 app/__init__.py
+app-serve:
+	DEV=True poetry run python3.9 app/main.py
 
 docs:
-	pdoc3 app --html --output-dir docs/api --force
+	pdoc3 app --html --output-dir docs/_build --force
+
+docs-serve:
+	python3 -m http.server --directory ./docs/_build

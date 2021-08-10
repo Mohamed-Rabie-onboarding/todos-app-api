@@ -1,6 +1,5 @@
 from bottle import abort
-from pydantic import validate_email
-from pydantic import ValidationError
+from pydantic import validate_email, ValidationError
 
 
 def _create_error(field: str, message: str):

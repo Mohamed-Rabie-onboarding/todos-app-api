@@ -8,4 +8,4 @@ docsRoutes.error_handler = error_handler
 @docsRoutes.get('/<filename:re:.*>')
 def serve_swagger_ui(filename):
     print(filename)
-    return static_file(filename, root='app/swagger-ui/')
+    return static_file(filename, root='public/')
