@@ -110,9 +110,14 @@
           "200": {
             "description": "Return collections for the login user.",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CollectionModel"
+              "type": "object",
+              "properties": {
+                "collections": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/CollectionModel"
+                  }
+                }
               }
             }
           },
@@ -255,9 +260,14 @@
           "200": {
             "description": "Collection found and todos returned.",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/TodoModel"
+              "type": "object",
+              "properties": {
+                "todos": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/TodoModel"
+                  }
+                }
               }
             }
           },
@@ -288,9 +298,14 @@
           "200": {
             "description": "Collection found and items returned.",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/TodoItemModel"
+              "type": "object",
+              "properties": {
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/TodoItemModel"
+                  }
+                }
               }
             }
           },
@@ -313,9 +328,14 @@
           "200": {
             "description": "Todos found and returned",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/TodoModel"
+              "type": "object",
+              "properties": {
+                "todos": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/TodoModel"
+                  }
+                }
               }
             }
           },
@@ -431,9 +451,14 @@
           "200": {
             "description": "todo found and its items returned",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/TodoItemModel"
+              "type": "object",
+              "properties": {
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/TodoItemModel"
+                  }
+                }
               }
             }
           },
@@ -575,9 +600,14 @@
           "200": {
             "description": "returned user TodoItems.",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/TodoItemModel"
+              "type": "object",
+              "properties": {
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/TodoItemModel"
+                  }
+                }
               }
             }
           },
