@@ -1,10 +1,12 @@
 from bottle import Bottle, request, response
 from utils.decorators import enable_cors, required_auth
 from utils.orm_helper import TodoItemOrmHelper
-from utils.validator_helper import ValidatorHelper
+from utils.validator_helper import error_if_not_found
 from database.models.todo_item import TodoItemModel
+from routes.error import error_handler
 
 todoItemRoutes = Bottle()
+todoItemRoutes.error_handler = error_handler
 
 
 @todoItemRoutes.get('/<id:int>')
@@ -13,9 +15,7 @@ todoItemRoutes = Bottle()
 def get_item_handler(user_id: int, id: int):
     item = TodoItemOrmHelper.get_todo_item(id, user_id)
 
-    if item is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Server', 'TodoItem not found.')
+    error_if_not_found(item, 'TodoItem')
 
     response.status = 200
     return item.to_dict()
@@ -37,11 +37,7 @@ def get_items_handler(user_id: int):
 @enable_cors
 @required_auth
 def create_todo_item_handler(user_id: int, todo_id: int):
-    item, errors = TodoItemModel.factory(request.json)
-
-    if errors is not None:
-        response.status = 400
-        return errors
+    item = TodoItemModel.factory(request.json)
 
     db_item = item.to_orm(user_id, todo_id)
     TodoItemOrmHelper.create_todo_item(db_item)
@@ -54,20 +50,13 @@ def create_todo_item_handler(user_id: int, todo_id: int):
 @required_auth
 def update_todo_item_handler(user_id: int, id: int):
     body = request.json
-    item, errors = TodoItemModel.factory(body, True)
-
-    if errors is not None:
-        response.status = 400
-        return errors
+    item = TodoItemModel.factory(body, True)
 
     db_item = TodoItemOrmHelper.get_todo_item(id, user_id)
 
-    if db_item is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Sever', 'TodoItem not found.')
+    error_if_not_found(db_item, 'TodoItem')
 
     TodoItemOrmHelper.update_todo_item(db_item, **body)
-
     response.status = 204
 
 
@@ -77,8 +66,6 @@ def update_todo_item_handler(user_id: int, id: int):
 def delete_todo_item_handler(user_id: int, id: int):
     removed = TodoItemOrmHelper.remove_todo_item(id, user_id)
 
-    if not removed:
-        response.status = 404
-        return ValidatorHelper.create_error('Sever', 'TodoItem not found.')
+    error_if_not_found(removed, 'TodoItem')
 
     response.status = 204

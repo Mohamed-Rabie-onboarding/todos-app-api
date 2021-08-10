@@ -1,5 +1,5 @@
+from bottle import abort
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
-from sqlalchemy.orm import relationship
 from database.models.base import Base, IToOrm
 from datetime import datetime
 from pydantic import BaseModel, validator, ValidationError
@@ -42,8 +42,8 @@ class TodoModel(BaseModel):
 
     @staticmethod
     def factory(body: dict):
-        body = body if (body is not None) else {}
         try:
-            return (TodoModel(**body), None)
+            body = body if (body is not None) else {}
+            return TodoModel(**body)
         except ValidationError as e:
-            return (None, ValidatorHelper.format_errors(e))
+            abort(400, ValidatorHelper.format_errors(e))

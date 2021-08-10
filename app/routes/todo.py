@@ -2,9 +2,11 @@ from bottle import Bottle, request, response
 from utils.decorators import enable_cors, required_auth
 from database.models.todo import TodoModel
 from utils.orm_helper import TodoOrmHelper
-from utils.validator_helper import ValidatorHelper
+from utils.validator_helper import error_if_not_found
+from routes.error import error_handler
 
 todoRoutes = Bottle()
+todoRoutes.error_handler = error_handler
 
 
 @todoRoutes.get('/<id:int>')
@@ -13,9 +15,7 @@ todoRoutes = Bottle()
 def get_todo_handler(user_id: int, id: int):
     todo = TodoOrmHelper.get_todo(id, user_id)
 
-    if todo is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Server', 'Todo not found.')
+    error_if_not_found(todo, 'Todo')
 
     response.status = 200
     return todo.to_dict()
@@ -39,9 +39,7 @@ def get_todos_handler(user_id: int):
 def get_todo_items_handler(user_id: int, id: int):
     todo = TodoOrmHelper.get_todo(id, user_id)
 
-    if todo is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Sever', 'Todo not found.')
+    error_if_not_found(todo, 'Todo')
 
     response.status = 200
     return {
@@ -55,11 +53,7 @@ def get_todo_items_handler(user_id: int, id: int):
 @enable_cors
 @required_auth
 def create_todo_handler(user_id: int, collection_id: int):
-    todo, errors = TodoModel.factory(request.json)
-
-    if errors is not None:
-        response.status = 400
-        return errors
+    todo = TodoModel.factory(request.json)
 
     db_todo = todo.to_orm(user_id=user_id, collection_id=collection_id)
     TodoOrmHelper.create_todo(db_todo)
@@ -71,17 +65,11 @@ def create_todo_handler(user_id: int, collection_id: int):
 @enable_cors
 @required_auth
 def update_todo_handler(user_id: int, id: int):
-    todo, errors = TodoModel.factory(request.json)
-
-    if errors is not None:
-        response.status = 400
-        return errors
+    todo = TodoModel.factory(request.json)
 
     db_todo = TodoOrmHelper.get_todo(id, user_id)
 
-    if db_todo is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Sever', 'Todo not found.')
+    error_if_not_found(db_todo, 'Todo')
 
     TodoOrmHelper.update_todo(db_todo, todo.description)
 
@@ -94,8 +82,6 @@ def update_todo_handler(user_id: int, id: int):
 def delete_todo_handler(user_id: int, id: int):
     removed = TodoOrmHelper.remove_todo(id, user_id)
 
-    if not removed:
-        response.status = 404
-        return ValidatorHelper.create_error('Sever', 'Todo not found.')
+    error_if_not_found(removed, 'Todo')
 
     response.status = 204

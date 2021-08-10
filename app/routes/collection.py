@@ -2,10 +2,11 @@ from bottle import Bottle, request, response
 from utils.decorators import enable_cors, required_auth
 from utils.orm_helper import CollectionOrmHelper
 from database.models.collection import CollectionModel
-from utils.validator_helper import ValidatorHelper
-
+from utils.validator_helper import error_if_not_found
+from routes.error import error_handler
 
 collectionRoutes = Bottle()
+collectionRoutes.error_handler = error_handler
 
 
 @collectionRoutes.get('/<id:int>')
@@ -14,9 +15,7 @@ collectionRoutes = Bottle()
 def get_collection_handler(user_id: int, id: int):
     collection = CollectionOrmHelper.get_collection(id, user_id)
 
-    if collection is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Server', 'Collection not found.')
+    error_if_not_found(collection, 'Collection')
 
     response.status = 200
     return collection.to_dict()
@@ -40,9 +39,7 @@ def get_collections_handler(user_id: int):
 def get_collection_todos_handler(user_id: int, id: int):
     collection = CollectionOrmHelper.get_collection(id, user_id)
 
-    if collection is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Sever', 'Collection not found.')
+    error_if_not_found(collection, 'Collection')
 
     response.status = 200
     return {
@@ -58,9 +55,7 @@ def get_collection_todos_handler(user_id: int, id: int):
 def get_collection_items_handler(user_id: int, id: int):
     collection = CollectionOrmHelper.get_collection(id, user_id)
 
-    if collection is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Sever', 'Collection not found.')
+    error_if_not_found(collection, 'Collection')
 
     response.status = 200
 
@@ -81,11 +76,7 @@ def get_collection_items_handler(user_id: int, id: int):
 @enable_cors
 @required_auth
 def create_collection_handler(user_id: int):
-    collection, errors = CollectionModel.factory(request.json)
-
-    if errors is not None:
-        response.status = 400
-        return errors
+    collection = CollectionModel.factory(request.json)
 
     db_collection = collection.to_orm(user_id=user_id)
     CollectionOrmHelper.create_collection(db_collection)
@@ -98,20 +89,13 @@ def create_collection_handler(user_id: int):
 @enable_cors
 @required_auth
 def update_collection_handler(user_id: int, id: int):
-    collection, errors = CollectionModel.factory(request.json)
-
-    if errors is not None:
-        response.status = 400
-        return errors
+    collection = CollectionModel.factory(request.json)
 
     db_collection = CollectionOrmHelper.get_collection(id, user_id)
 
-    if db_collection is None:
-        response.status = 404
-        return ValidatorHelper.create_error('Server', 'Collection not found.')
+    error_if_not_found(db_collection, 'Collection')
 
     CollectionOrmHelper.update_collection(db_collection, collection.title)
-
     response.status = 204
 
 
@@ -121,8 +105,6 @@ def update_collection_handler(user_id: int, id: int):
 def delete_collection_handler(user_id: int, id: int):
     removed = CollectionOrmHelper.remove_collection(id, user_id)
 
-    if not removed:
-        response.status = 404
-        return ValidatorHelper.create_error('Sever', 'Collection not found.')
+    error_if_not_found(removed, 'Collection')
 
     response.status = 204

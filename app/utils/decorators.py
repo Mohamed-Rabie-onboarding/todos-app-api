@@ -1,5 +1,5 @@
-from utils.validator_helper import ValidatorHelper
-from bottle import request, response
+from utils.validator_helper import create_errors
+from bottle import request, response, abort
 from utils.jwt_helper import JwtHelper
 
 
@@ -9,12 +9,10 @@ def required_auth(fn):
             bearer: str = request.get_header('Authorization')
             token = bearer[len('bearer ')::]
             payload = JwtHelper.verify(token)
-        except Exception as e:
-            print(e)
-            response.status = 401
-            return ValidatorHelper.create_error(
-                'Server',
-                'Unauthorized to make this request.'
+        except:
+            abort(
+                401,
+                create_errors('Server', 'Unauthorized to make this request.')
             )
 
         # return the main router without try/catch

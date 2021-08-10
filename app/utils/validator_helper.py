@@ -1,5 +1,25 @@
+from bottle import abort
 from pydantic import validate_email
 from pydantic import ValidationError
+
+
+def _create_error(field: str, message: str):
+    return {'field': field, 'message': message}
+
+
+def create_errors(field: str, message: str):
+    return {
+        'errors': [_create_error(field, message)]
+    }
+
+
+def not_found_error(field: str):
+    abort(404, create_errors('Server', f'{field} not found.'))
+
+
+def error_if_not_found(item, field: str):
+    if item is None or item == False:
+        not_found_error(field)
 
 
 class ValidatorHelper:
@@ -48,20 +68,8 @@ class ValidatorHelper:
         errors = []
 
         for error in ve.errors():
-            errors.append({
-                'field': error['loc'][0],
-                'message': error['msg']
-            })
+            errors.append(
+                _create_error(error['loc'][0], error['msg'])
+            )
 
         return {'errors': errors}
-
-    @staticmethod
-    def create_error(field: str, message: str):
-        return {
-            'errors': [
-                {
-                    'field': field,
-                    'message': message
-                }
-            ]
-        }

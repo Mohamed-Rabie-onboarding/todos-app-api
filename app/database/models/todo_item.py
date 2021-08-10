@@ -1,4 +1,5 @@
 from typing import Optional
+from bottle import abort
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean
 from database.models.base import Base, IToOrm
 from datetime import datetime
@@ -50,12 +51,13 @@ class TodoItemModel(BaseModel):
 
     @staticmethod
     def factory(body: dict, can_ignore_body=False):
-        body = body if (body is not None) else {}
         try:
+            body = body if (body is not None) else {}
+
             # temp solution
             if can_ignore_body and 'body' not in body:
                 body['body'] = 'xxxxx'
 
-            return (TodoItemModel(**body), None)
+            return TodoItemModel(**body)
         except ValidationError as e:
-            return (None, ValidatorHelper.format_errors(e))
+            abort(400, ValidatorHelper.format_errors(e))

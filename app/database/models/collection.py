@@ -1,3 +1,4 @@
+from bottle import abort
 from sqlalchemy import Column, Integer, Date, ForeignKey, String
 from sqlalchemy.orm import relationship
 from database.models.base import Base, IToOrm
@@ -43,8 +44,8 @@ class CollectionModel(BaseModel):
 
     @staticmethod
     def factory(body: dict):
-        body = body if (body is not None) else {}
         try:
-            return (CollectionModel(**body), None)
+            body = body if (body is not None) else {}
+            return CollectionModel(**body)
         except ValidationError as e:
-            return (None, ValidatorHelper.format_errors(e))
+            return abort(400, ValidatorHelper.format_errors(e))

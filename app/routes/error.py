@@ -1,25 +1,20 @@
-from bottle import Bottle, HTTPError
+from utils.validator_helper import create_errors
+from bottle import HTTPError, response, abort
 
 
-errorRoutes = Bottle()
+def _error_handler(error: HTTPError):
+    response.status = error.status_code
+    return error.body
 
 
-@errorRoutes.error(400)
-def bad_request_handler(err: HTTPError):
-    return {'error': 'bad_request_handler'}
+def _internal_server_error(_):
+    abort(500, create_errors('Server', 'Internal Server Error.'))
 
 
-@errorRoutes.error(404)
-def page_not_found(err: HTTPError):
-    return {'error': 'page_not_found'}
-
-
-@errorRoutes.error(405)
-def method_not_allowed(err: HTTPError):
-    return {'error': 'errmethod_not_allowedor'}
-
-
-@errorRoutes.error(500)
-def internal_server_error(err: HTTPError):
-    print('Error', err)
-    return {'error': 'internal_server_error'}
+error_handler = {
+    400: _error_handler,
+    401: _error_handler,
+    404: _error_handler,
+    409: _error_handler,
+    500: _internal_server_error
+}
