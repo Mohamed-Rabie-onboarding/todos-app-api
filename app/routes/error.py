@@ -1,14 +1,24 @@
 from utils.validator_helper import create_errors
-from bottle import HTTPError, response, abort
+from bottle import HTTPError, response
+from json import dumps, loads
 
 
 def _error_handler(error: HTTPError):
-    response.status = error.status_code
-    return error.body
+    try:
+        errors = loads(error.body)
+        errors = error.body
+    except:
+        errors = dumps(create_errors('Server', error.body))
+
+    response.status = error.status
+    response.set_header('content-type', 'application/json')
+    return errors
 
 
 def _internal_server_error(_):
-    abort(500, create_errors('Server', 'Internal Server Error.'))
+    response.status = 500
+    response.set_header('content-type', 'application/json')
+    return dumps(create_errors('Server', 'Internal Server Error.'))
 
 
 error_handler = {
