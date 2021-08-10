@@ -1,4 +1,4 @@
-from typing import Optional
+from bottle import HTTPError, abort
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship
 from database.models.base import Base, IToOrm
@@ -73,6 +73,7 @@ class UserModel(BaseModel):
 
     @staticmethod
     def factory(body: dict, username=True):
+        body = body if (body is not None) else {}
         try:
 
             # temp solution
@@ -82,4 +83,11 @@ class UserModel(BaseModel):
 
             return (UserModel(**body), None)
         except ValidationError as e:
-            return (None, ValidatorHelper.format_errors(e))
+            # return (None, ValidatorHelper.format_errors(e))
+            print('here??')
+            # raise abort(400, ValidatorHelper.format_errors(e))
+            # raise Exception({
+            #     'code': 400,
+            #     'message': ValidatorHelper.format_errors(e)
+            # })
+            raise HTTPError(500, ValidatorHelper.format_errors(e))

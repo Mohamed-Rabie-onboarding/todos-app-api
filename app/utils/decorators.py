@@ -9,13 +9,17 @@ def required_auth(fn):
             bearer: str = request.get_header('Authorization')
             token = bearer[len('bearer ')::]
             payload = JwtHelper.verify(token)
-            return fn(payload.get('id'), *args, **kwargs)
         except Exception as e:
+            print(e)
             response.status = 401
             return ValidatorHelper.create_error(
                 'Server',
                 'Unauthorized to make this request.'
             )
+
+        # return the main router without try/catch
+        # so it allow the error to flow for error routes
+        return fn(payload.get('id'), *args, **kwargs)
 
     return _get_user_id
 

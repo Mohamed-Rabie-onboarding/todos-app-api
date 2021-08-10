@@ -18,7 +18,6 @@ class TodoItemOrm(Base, IToOrm):
     # relations
     user_id = Column(Integer, ForeignKey('users.id'))
     todo_id = Column(Integer, ForeignKey('todos.id'))
-    collection_id = Column(Integer, ForeignKey('collections.id'))
 
     def to_dict(self):
         return {
@@ -51,6 +50,7 @@ class TodoItemModel(BaseModel):
 
     @staticmethod
     def factory(body: dict, can_ignore_body=False):
+        body = body if (body is not None) else {}
         try:
             # temp solution
             if can_ignore_body and 'body' not in body:

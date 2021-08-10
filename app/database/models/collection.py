@@ -43,6 +43,7 @@ class CollectionModel(BaseModel):
 
     @staticmethod
     def factory(body: dict):
+        body = body if (body is not None) else {}
         try:
             return (CollectionModel(**body), None)
         except ValidationError as e:

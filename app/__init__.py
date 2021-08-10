@@ -1,7 +1,7 @@
 import py_dotenv
 import os
 from os.path import join, dirname
-from bottle import Bottle
+from bottle import Bottle, HTTPError
 
 
 def main():
@@ -18,13 +18,14 @@ def main():
     from routes.collection import collectionRoutes
     from routes.todo import todoRoutes
     from routes.todo_item import todoItemRoutes
-    from routes.error import errorRoutes
+    # from routes.error import errorRoutes
+
+    # app.merge(errorRoutes)
 
     app.mount('/api/v1/user', userRoutes)
     app.mount('/api/v1/collection', collectionRoutes)
     app.mount('/api/v1/todo', todoRoutes)
     app.mount('/api/v1/todo-item', todoItemRoutes)
-    app.merge(errorRoutes)
 
     # run the app
     app.run(

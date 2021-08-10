@@ -4,6 +4,7 @@ from utils.jwt_helper import JwtHelper
 from utils.decorators import enable_cors, required_auth
 from utils.validator_helper import ValidatorHelper
 from utils.orm_helper import UserOrmHelper
+from routes.error import errorRoutes
 
 
 userRoutes = Bottle()
