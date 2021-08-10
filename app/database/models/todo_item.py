@@ -43,7 +43,7 @@ class TodoItemModel(BaseModel):
 
     @validator('body')
     def body_validator(cls, value: str):
-        return ValidatorHelper('Body', value).is_not_empty().has_min_length(3).has_max_length(400).get_value()
+        return ValidatorHelper('Body', value).is_not_empty().has_min_length(3).has_max_length(500).get_value()
 
     @validator('done')
     def done_validator(cls, value: bool):

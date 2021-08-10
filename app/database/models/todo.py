@@ -4,6 +4,7 @@ from database.models.base import Base, IToOrm
 from datetime import datetime
 from pydantic import BaseModel, validator, ValidationError
 from utils.validator_helper import ValidatorHelper
+from sqlalchemy.orm import relationship
 
 
 class TodoOrm(Base, IToOrm):
@@ -17,6 +18,7 @@ class TodoOrm(Base, IToOrm):
     # relations
     user_id = Column(Integer, ForeignKey('users.id'))
     collection_id = Column(Integer, ForeignKey('collections.id'))
+    items = relationship('TodoItemOrm', cascade="all,delete")
 
     def to_dict(self):
         return {

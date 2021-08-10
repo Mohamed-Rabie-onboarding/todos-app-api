@@ -1,16 +1,446 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "This is a sample server Petstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters.",
-    "version": "1.0.0",
-    "title": "Swagger Petstore",
-    "termsOfService": "http://swagger.io/terms/",
-    "contact": {
-      "email": "apiteam@swagger.io"
+    "title": "Todos App",
+    "description": "This is a simple todos app api for onboarding period in codescalers company.",
+    "version": "v1"
+  },
+  "basePath": "/api/v1",
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization",
+      "description": "Token u got from login user /user/authenticate"
+    }
+  },
+  "paths": {
+    "/user": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Return current login user.",
+        "description": "Requires only  Authorization header with user token.",
+        "responses": {
+          "200": {
+            "description": "User found and returned.",
+            "schema": {
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "username": {
+                  "type": "string",
+                  "example": "admin"
+                },
+                "picture": {
+                  "type": "string",
+                  "example": "http://placehold.it/250x250"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token is not correct or not found."
+          }
+        }
+      },
+      "post": {
+        "tags": ["User"],
+        "summary": "Register new user.",
+        "description": "Create new user in database.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Body for adding new user.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateUserBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created sucessfully."
+          },
+          "400": {
+            "description": "RequestBody is not valid."
+          },
+          "409": {
+            "description": "Eamil already in use."
+          }
+        }
+      }
     },
-    "license": {
-      "name": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    "/user/authenticate": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Login user.",
+        "description": "Verify user email & password and generate token.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Body for login user.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginUserBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User found, verified and token returned."
+          },
+          "400": {
+            "description": "RequestBody is not valid."
+          },
+          "401": {
+            "description": "Email and password do not match."
+          }
+        }
+      }
+    },
+    "/collection/{id}": {
+      "get": {
+        "tags": ["Collection"],
+        "summary": "Get single collection.",
+        "description": "Get specific collection with id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collection found and returned.",
+            "schema": {
+              "$ref": "#/definitions/CollectionModel"
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "put": {
+        "tags": ["Collection"],
+        "summary": "Update a collection by id.",
+        "parameters": [
+          {
+            "description": "id for the collection that needs update.",
+            "name": "id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "default": 1
+          },
+          {
+            "description": "Data needed to update collection",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateCollectionModel"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Collection updated sccuessfully"
+          },
+          "400": {
+            "description": "RequestBody is not valid."
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          },
+          "404": {
+            "description": "Collection not found."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "delete": {
+        "tags": ["Collection"],
+        "summary": "Remove collection by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Collection removed successfully"
+          },
+          "404": {
+            "description": "Collection not found"
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/collection": {
+      "get": {
+        "tags": ["Collection"],
+        "summary": "Get all collection for a user.",
+        "responses": {
+          "200": {
+            "description": "Return collections for the login user.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CollectionModel"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "post": {
+        "tags": ["Collection"],
+        "summary": "Add new colletion.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateCollectionModel"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Collection created and returned",
+            "schema": {
+              "$ref": "#/definitions/CollectionModel"
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/collection/{id}/todos": {
+      "get": {
+        "tags": ["Collection"],
+        "description": "Get todos of collection by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "default": 1,
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collection found and todos returned.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TodoModel"
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/collection/{id}/items": {
+      "get": {
+        "tags": ["Collection"],
+        "description": "Get items of collection by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "default": 1,
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collection found and items returned.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TodoItemModel"
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    }
+  },
+  "definitions": {
+    "CollectionModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "title": {
+          "type": "string",
+          "example": "awesome title",
+          "minLength": 3,
+          "maxLength": 100
+        },
+        "created_at": {
+          "type": "string",
+          "example": "2021-08-10T10:13:38.189Z"
+        },
+        "user_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "todos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TodoModel"
+          }
+        }
+      }
+    },
+    "TodoModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "description": {
+          "type": "string",
+          "example": "awesome description",
+          "minLength": 3,
+          "maxLength": 400
+        },
+        "created_at": {
+          "type": "string",
+          "example": "2021-08-10T10:13:38.189Z"
+        },
+        "user_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "collection_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TodoItemModel"
+          }
+        }
+      }
+    },
+    "TodoItemModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "body": {
+          "type": "string",
+          "example": "awesome body",
+          "minLength": 3,
+          "maxLength": 500
+        },
+        "done": {
+          "type": "boolean",
+          "example": false
+        },
+        "created_at": {
+          "type": "string",
+          "example": "2021-08-10T10:13:38.189Z"
+        },
+        "user_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "todo_id": {
+          "type": "integer",
+          "example": 1
+        }
+      }
+    },
+    "CreateUserBody": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 20,
+          "example": "admin"
+        },
+        "email": {
+          "type": "string",
+          "format": "Email",
+          "example": "admin@admin.com"
+        },
+        "password": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 80,
+          "example": "admin0"
+        }
+      },
+      "required": ["username", "email", "password"]
+    },
+    "LoginUserBody": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "Email",
+          "example": "admin@admin.com"
+        },
+        "password": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 80,
+          "example": "admin0"
+        }
+      },
+      "required": ["email", "password"]
+    },
+    "CreateCollectionModel": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "awesome title",
+          "minLength": 3,
+          "maxLength": 100
+        }
+      },
+      "required": ["title"]
     }
   }
 }
