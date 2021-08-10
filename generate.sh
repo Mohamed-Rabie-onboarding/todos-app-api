@@ -1,0 +1,1 @@
+DEV=True poetry run python3.9 app/generate/yaml.py
