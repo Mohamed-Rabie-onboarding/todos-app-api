@@ -102,6 +102,52 @@
         }
       }
     },
+    "/collection": {
+      "get": {
+        "tags": ["Collection"],
+        "summary": "Get all collection for a user.",
+        "responses": {
+          "200": {
+            "description": "Return collections for the login user.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CollectionModel"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "post": {
+        "tags": ["Collection"],
+        "summary": "Add new colletion.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateCollectionModel"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Collection created and returned",
+            "schema": {
+              "$ref": "#/definitions/CollectionModel"
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
     "/collection/{id}": {
       "get": {
         "tags": ["Collection"],
@@ -182,54 +228,11 @@
           "204": {
             "description": "Collection removed successfully"
           },
+          "401": {
+            "description": "Unauthorized to make this request."
+          },
           "404": {
             "description": "Collection not found"
-          }
-        },
-        "security": [{ "ApiKeyAuth": [] }]
-      }
-    },
-    "/collection": {
-      "get": {
-        "tags": ["Collection"],
-        "summary": "Get all collection for a user.",
-        "responses": {
-          "200": {
-            "description": "Return collections for the login user.",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CollectionModel"
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized to make this request."
-          }
-        },
-        "security": [{ "ApiKeyAuth": [] }]
-      },
-      "post": {
-        "tags": ["Collection"],
-        "summary": "Add new colletion.",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/CreateCollectionModel"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Collection created and returned",
-            "schema": {
-              "$ref": "#/definitions/CollectionModel"
-            }
-          },
-          "401": {
-            "description": "Unauthorized to make this request."
           }
         },
         "security": [{ "ApiKeyAuth": [] }]
@@ -257,6 +260,9 @@
                 "$ref": "#/definitions/TodoModel"
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
           },
           "404": {
             "description": "Collection not found."
@@ -288,8 +294,330 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized to make this request."
+          },
           "404": {
             "description": "Collection not found."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/todo": {
+      "get": {
+        "tags": ["Todo"],
+        "summary": "Get user todos.",
+        "description": "Get current login user todos.",
+        "responses": {
+          "200": {
+            "description": "Todos found and returned",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TodoModel"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/todo/{id}": {
+      "get": {
+        "tags": ["Todo"],
+        "summary": "Get todo by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "todo found and returned",
+            "schema": {
+              "$ref": "#/definitions/TodoModel"
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          },
+          "404": {
+            "description": "Todo not found"
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "put": {
+        "tags": ["Todo"],
+        "summary": "Update todo by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateTodoBody"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Todo updated successfully"
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          },
+          "404": {
+            "description": "Todo not found"
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "delete": {
+        "tags": ["Todo"],
+        "summary": "Delete todo by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Todo removed successfully"
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          },
+          "404": {
+            "description": "Todo not found"
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/todo/{id}/items": {
+      "get": {
+        "tags": ["Todo"],
+        "summary": "Get items of todo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "todo found and its items returned",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TodoItemModel"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          },
+          "404": {
+            "description": "Todo not found"
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/todo/{collection_id}": {
+      "post": {
+        "tags": ["Todo"],
+        "summary": "Added new todo.",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateTodoBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Todo created and returned",
+            "schema": {
+              "$ref": "#/definitions/TodoModel"
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/todo-item/{id}": {
+      "get": {
+        "tags": ["TodoItem"],
+        "summary": "Get a single todo item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "TodoItem found and returned.",
+            "schema": {
+              "$ref": "#/definitions/TodoItemModel"
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          },
+          "404": {
+            "description": "TodoItem not found"
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "put": {
+        "tags": ["TodoItem"],
+        "summary": "Update todoitem by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateTodoModelBody"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Update todoitem successfully."
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "delete": {
+        "tags": ["TodoItem"],
+        "summary": "delete todoitem by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed todoitem successfully."
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          },
+          "404": {
+            "description": "TodoItem not found"
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/todo-item": {
+      "get": {
+        "tags": ["TodoItem"],
+        "summary": "Get all user todoitems",
+        "responses": {
+          "200": {
+            "description": "returned user TodoItems.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TodoItemModel"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
+          }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/todo-item/{todo_id}": {
+      "post": {
+        "tags": ["TodoItem"],
+        "summary": "Create new todoitem",
+        "parameters": [
+          {
+            "name": "todo_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateTodoModelBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Added todoitem successfully.",
+            "schema": {
+              "$ref": "#/definitions/TodoItemModel"
+            }
+          },
+          "401": {
+            "description": "Unauthorized to make this request."
           }
         },
         "security": [{ "ApiKeyAuth": [] }]
@@ -441,6 +769,45 @@
         }
       },
       "required": ["title"]
+    },
+    "CreateTodoBody": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "example": "awesome description",
+          "minLength": 3,
+          "maxLength": 400
+        }
+      },
+      "required": ["description"]
+    },
+    "CreateTodoModelBody": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "example": "aweomse body",
+          "minLength": 3,
+          "maxLength": 500
+        }
+      },
+      "required": ["body"]
+    },
+    "UpdateTodoModelBody": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "example": "aweomse body",
+          "minLength": 3,
+          "maxLength": 500
+        },
+        "done": {
+          "type": "boolean",
+          "example": true
+        }
+      }
     }
   }
 }

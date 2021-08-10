@@ -43,6 +43,7 @@ def create_todo_item_handler(user_id: int, todo_id: int):
     TodoItemOrmHelper.create_todo_item(db_item)
 
     response.status = 201
+    return db_item.to_dict()
 
 
 @todoItemRoutes.put('/<id:int>')
