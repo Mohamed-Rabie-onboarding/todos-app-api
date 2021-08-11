@@ -8,6 +8,9 @@ from sqlalchemy.orm import relationship
 
 
 class TodoOrm(Base, IToOrm):
+    """ class TodoOrm
+        A class representation of Todo model in database
+    """
     __tablename__ = 'todos'
 
     # table columns
@@ -21,18 +24,27 @@ class TodoOrm(Base, IToOrm):
     items = relationship('TodoItemOrm', cascade="all,delete")
 
     def to_dict(self):
+        """ to_dict turns todo into a dict
+        """
         return {
             'id': self.id,
             'description': self.description,
             'collection_id': self.collection_id,
-            'created_at': self.created_at.isoformat()
+            'created_at': self.created_at.isoformat(),
+            'user_id': self.user_id,
+            'items': [item.to_dict() for item in self.items]
         }
 
 
 class TodoModel(BaseModel):
+    """ class TodoModel
+        Initialize this class cause a validation check py `pydantic` package
+    """
     description: str
 
     def to_orm(self, **kwargs):
+        """ to_orm turn `TodoModel` into `TodoOrm`
+        """
         return TodoOrm(
             description=self.description,
             **kwargs
@@ -44,6 +56,9 @@ class TodoModel(BaseModel):
 
     @staticmethod
     def factory(body: dict):
+        """ factory create a TodoModel and handle error
+            if validation didn't pass
+        """
         try:
             body = body if (body is not None) else {}
             return TodoModel(**body)

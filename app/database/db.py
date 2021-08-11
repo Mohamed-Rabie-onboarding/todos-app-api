@@ -12,6 +12,13 @@ from database.models.todo_item import TodoItemOrm
 
 
 def create_db_session(uri: str):
+    """ create_db_session initialize a database engine
+        checking if the database not exists
+        if so it creates the database and register tables
+        then it creates a Session and returns it
+
+        :param uri: connection_string for database
+    """
     engine = create_engine(uri)
 
     if not database_exists(engine.url):

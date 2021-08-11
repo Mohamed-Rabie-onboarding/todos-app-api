@@ -9,6 +9,9 @@ from utils.validator_helper import ValidatorHelper
 
 
 class UserOrm(Base, IToOrm):
+    """ class UserOrm
+        A class representation of User model in database
+    """
     __tablename__ = 'users'
 
     # table columns
@@ -25,6 +28,9 @@ class UserOrm(Base, IToOrm):
     todos_items = relationship('TodoItemOrm', cascade="all,delete")
 
     def to_dict(self, token=None):
+        """ to_dict turns the only public fields of a user model into a dict
+            so it can be used as a returned value from routes
+        """
         user = {
             'id': self.id,
             'username': self.username,
@@ -36,6 +42,9 @@ class UserOrm(Base, IToOrm):
 
 
 class UserModel(BaseModel):
+    """ class UserModel
+        Initialize this class cause a validation check py `pydantic` package
+    """
     # metadata
     include_username: bool
 
@@ -44,6 +53,11 @@ class UserModel(BaseModel):
     password: str
 
     def to_orm(self, **kwargs):
+        """ to_orm turns `UserModel` into `UserOrm`
+            so it can be used with database
+            as this class won't be used unless u're creating new user
+            so it hash password while converting to `UserOrm`
+        """
         hash_password = bcrypt.hashpw(
             self.password.encode('utf-8'),
             bcrypt.gensalt(12),
@@ -57,6 +71,9 @@ class UserModel(BaseModel):
         )
 
     def password_matched(self, hash: str):
+        """ password_matched checks if the password and hashed value
+            matches eachother
+        """
         return bcrypt.checkpw(self.password.encode('utf-8'), hash.encode('utf-8'))
 
     @validator('username')
@@ -73,6 +90,9 @@ class UserModel(BaseModel):
 
     @staticmethod
     def factory(body: dict, username=True):
+        """ factory create a UserModel and handle error
+            if validation didn't pass
+        """
         try:
             body = body if (body is not None) else {}
 

@@ -8,6 +8,9 @@ from utils.validator_helper import ValidatorHelper
 
 
 class TodoItemOrm(Base, IToOrm):
+    """ class TodoItemOrm
+        A class representation of TodoItem model in database
+    """
     __tablename__ = 'items'
 
     # table columns
@@ -21,6 +24,8 @@ class TodoItemOrm(Base, IToOrm):
     todo_id = Column(Integer, ForeignKey('todos.id'))
 
     def to_dict(self):
+        """ to_dict turns todoItem into a dict
+        """
         return {
             'id': self.id,
             'body': self.body,
@@ -32,10 +37,15 @@ class TodoItemOrm(Base, IToOrm):
 
 
 class TodoItemModel(BaseModel):
+    """ class TodoItemModel
+        Initialize this class cause a validation check py `pydantic` package
+    """
     body: str
     done: Optional[bool]
 
     def to_orm(self, **kwargs):
+        """ to_orm turn `TodoItemModel` into `TodoItemOrm`
+        """
         return TodoItemOrm(
             body=self.body,
             **kwargs
@@ -51,6 +61,9 @@ class TodoItemModel(BaseModel):
 
     @staticmethod
     def factory(body: dict, can_ignore_body=False):
+        """ factory create a TodoItemModel and handle error
+            if validation didn't pass
+        """
         try:
             body = body if (body is not None) else {}
 

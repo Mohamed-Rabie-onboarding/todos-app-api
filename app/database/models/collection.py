@@ -8,6 +8,9 @@ from utils.validator_helper import ValidatorHelper
 
 
 class CollectionOrm(Base, IToOrm):
+    """ class CollectionOrm
+        A class representation of Collection model in database
+    """
     __tablename__ = 'collections'
 
     # table columns
@@ -20,6 +23,8 @@ class CollectionOrm(Base, IToOrm):
     todos = relationship('TodoOrm', cascade="all,delete")
 
     def to_dict(self):
+        """ to_dict turns collection into a dict
+        """
         return {
             'id': self.id,
             'title': self.title,
@@ -30,9 +35,14 @@ class CollectionOrm(Base, IToOrm):
 
 
 class CollectionModel(BaseModel):
+    """ class CollectionModel
+        Initialize this class cause a validation check py `pydantic` package
+    """
     title: str
 
     def to_orm(self, **kwargs):
+        """ to_orm turn `CollectionModel` into `CollectionOrm`
+        """
         return CollectionOrm(
             title=self.title,
             **kwargs
@@ -44,6 +54,9 @@ class CollectionModel(BaseModel):
 
     @staticmethod
     def factory(body: dict):
+        """ factory create a CollectionModel and handle error
+            if validation didn't pass
+        """
         try:
             body = body if (body is not None) else {}
             return CollectionModel(**body)
