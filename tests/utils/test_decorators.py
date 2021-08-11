@@ -1,14 +1,14 @@
 from unittest import TestCase
 from app.utils.decorators import required_auth, enable_cors
 from app.utils.jwt_helper import JwtHelper
-from app.serve import serve
+from bottle import Bottle, response
 from webtest import TestApp
 
 
 class TestDecorators(TestCase):
 
     def test_required_auth(self):
-        app = serve()
+        app = Bottle()
         app_test = TestApp(app)
 
         @app.get('/')
@@ -16,6 +16,12 @@ class TestDecorators(TestCase):
         def required_auth_next(user_id: int):
             self.assertEqual(user_id, 1)
             return {'ok': True}
+
+        @app.error(401)
+        def error_401_handler(err):
+            response.status = 401
+            response.set_header('content-type', 'application/json')
+            return err.body
 
         # fail case
         res1 = app_test.get('/', expect_errors=True)
@@ -36,7 +42,7 @@ class TestDecorators(TestCase):
         self.assertDictEqual(res2.json, dict(ok=True))
 
     def test_enable_cors(self):
-        app = serve()
+        app = Bottle()
         app_test = TestApp(app)
 
         @app.get('/')
