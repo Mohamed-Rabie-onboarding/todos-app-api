@@ -36,4 +36,6 @@ def create_db_session(uri: str):
     return Session(engine)
 
 
-db_session = create_db_session(os.getenv('DB_URL'))
+db_session = create_db_session(
+    os.getenv('DB_URL')
+) if os.getenv('DB_URL') is not None else None
