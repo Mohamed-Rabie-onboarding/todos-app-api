@@ -13,6 +13,16 @@ collectionRoutes.error_handler = error_handler
 @enable_cors
 @required_auth
 def get_collection_handler(user_id: int, id: int):
+    """ get_collection_handler
+        required `Authorization` header with `bearer $token`
+        responses:
+            - 204: todo updated and nothing to return.
+            - 401: Unauthorized to make this request.
+            - 404: Collection not found.
+
+        :param user_id: the user `id`
+        :param id: the collection `id`
+    """
     collection = CollectionOrmHelper.get_collection(id, user_id)
 
     error_if_not_found(collection, 'Collection')
@@ -25,6 +35,15 @@ def get_collection_handler(user_id: int, id: int):
 @enable_cors
 @required_auth
 def get_collections_handler(user_id: int):
+    """ get_collection_handler
+        required `Authorization` header with `bearer $token`
+        responses:
+            - 200: collections return.
+            - 401: Unauthorized to make this request.
+
+        :param user_id: the user `id`
+        :param id: the collection `id`
+    """
     response.status = 200
     return {
         'collections': [
@@ -37,6 +56,16 @@ def get_collections_handler(user_id: int):
 @enable_cors
 @required_auth
 def get_collection_todos_handler(user_id: int, id: int):
+    """ get_collection_todos_handler
+        required `Authorization` header with `bearer $token`
+        responses:
+            - 200: todos returned.
+            - 401: Unauthorized to make this request.
+            - 404: Collection not found.
+
+        :param user_id: the user `id`
+        :param id: the collection `id`
+    """
     collection = CollectionOrmHelper.get_collection(id, user_id)
 
     error_if_not_found(collection, 'Collection')
@@ -53,6 +82,16 @@ def get_collection_todos_handler(user_id: int, id: int):
 @enable_cors
 @required_auth
 def get_collection_items_handler(user_id: int, id: int):
+    """ get_collection_items_handler
+        required `Authorization` header with `bearer $token`
+        responses:
+            - 200: items returned.
+            - 401: Unauthorized to make this request.
+            - 404: Collection not found.
+
+        :param user_id: the user `id`
+        :param id: the collection `id`
+    """
     collection = CollectionOrmHelper.get_collection(id, user_id)
 
     error_if_not_found(collection, 'Collection')
@@ -76,6 +115,16 @@ def get_collection_items_handler(user_id: int, id: int):
 @enable_cors
 @required_auth
 def create_collection_handler(user_id: int):
+    """ create_collection_handler
+        required `Authorization` header with `bearer $token`
+        takes in `body` includes title
+        responses:
+            - 201: collection created and returned.
+            - 400: invalid data.
+            - 401: Unauthorized to make this request.
+
+        :param user_id: the user `id`
+    """
     collection = CollectionModel.factory(request.json)
 
     db_collection = collection.to_orm(user_id=user_id)
@@ -89,6 +138,18 @@ def create_collection_handler(user_id: int):
 @enable_cors
 @required_auth
 def update_collection_handler(user_id: int, id: int):
+    """ update_collection_handler
+        required `Authorization` header with `bearer $token`
+        takes in `body` includes title
+        responses:
+            - 201: collection created and returned.
+            - 400: invalid data.
+            - 401: Unauthorized to make this request.
+            - 404: Collection not found.
+
+        :param user_id: the user `id`
+        :param id: the collection `id`
+    """
     collection = CollectionModel.factory(request.json)
 
     db_collection = CollectionOrmHelper.get_collection(id, user_id)
@@ -103,6 +164,16 @@ def update_collection_handler(user_id: int, id: int):
 @enable_cors
 @required_auth
 def delete_collection_handler(user_id: int, id: int):
+    """ delete_collection_handler
+        required `Authorization` header with `bearer $token`
+        responses:
+            - 201: collection created and returned.
+            - 401: Unauthorized to make this request.
+            - 404: Collection not found.
+
+        :param user_id: the user `id`
+        :param id: the collection `id`
+    """
     removed = CollectionOrmHelper.remove_collection(id, user_id)
 
     error_if_not_found(removed, 'Collection')

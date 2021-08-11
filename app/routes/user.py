@@ -14,6 +14,13 @@ userRoutes.error_handler = error_handler
 @userRoutes.post('/')
 @enable_cors
 def create_user_handler():
+    """ create_user_handler
+        takes in `body` includes username, email and password
+        responses:
+            - 201: User created & no content to create.
+            - 400: invalid data.
+            - 409: Email is duplicated.
+    """
     user = UserModel.factory(request.json)
 
     if UserOrmHelper.is_user_exist(email=user.email):
@@ -26,6 +33,13 @@ def create_user_handler():
 @userRoutes.post('/authenticate')
 @enable_cors
 def authenticate_user_handler():
+    """ authenticate_user_handler
+        takes in `body` includes email and password
+        responses:
+            - 201: User created & returns user with created token.
+            - 400: invalid data.
+            - 401: Email and password do not match.
+    """
     user = UserModel.factory(request.json, username=False)
 
     db_user = UserOrmHelper.get_user(email=user.email)
@@ -43,6 +57,12 @@ def authenticate_user_handler():
 @enable_cors
 @required_auth
 def get_current_user_handler(user_id: int):
+    """ get_current_user_handler
+        required `Authorization` header with `bearer $token`
+        responses:
+            - 200: User found and returned.
+            - 401: Unauthorized to make this request.
+    """
     db_user = UserOrmHelper.get_user(id=user_id)
 
     response.status = 200
