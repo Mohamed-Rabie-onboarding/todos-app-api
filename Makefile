@@ -1,5 +1,5 @@
 test:
-	DEV=True python3 -m pytest tests/ -s
+	DEV=True python3 -m pytest tests/ -s -p no:warnings -q
 
 dev:
 	DEV=True poetry run python3.9 main.py

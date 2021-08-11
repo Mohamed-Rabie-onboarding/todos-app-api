@@ -25,9 +25,6 @@ def serve():
 
     main_app = Bottle()
 
-    # load dotenv file only in development mode
-    development = load_env_if_dev()
-
     # import & register routes
     from app.routes.error import error_handler
     from app.routes.user import userRoutes
@@ -42,12 +39,5 @@ def serve():
     main_app.mount('/api/v1/todo', todoRoutes)
     main_app.mount('/api/v1/todo-item', todoItemRoutes)
     main_app.mount('/api/v1/docs', docsRoutes)
-
-    # run the main_app
-    main_app.run(
-        debug=development,
-        port=int(os.getenv('PORT')),
-        reloader=development,
-    )
 
     return main_app
