@@ -17,6 +17,9 @@ class JwtHelper:
 
             :param id: int value indicates `user id`
         """
+        if type(id) != int:
+            raise TypeError(f'Expected id of type int but found {type(id)}')
+
         return jwt.encode({
             'id': id,
             'date': datetime.now().isoformat(),

@@ -1,3 +1,6 @@
+test:
+	DEV=True python3 -m pytest tests/ -s
+
 dev:
 	DEV=True poetry run python3.9 main.py
 

@@ -1,3 +1,19 @@
+import os
+
+
+def load_env_if_dev():
+    """ load_env_if_dev checks if app running on dev mode
+        if so it loads up the env variable file
+    """
+    from os.path import join, dirname
+    development = bool(os.getenv('DEV'))
+    if development:
+        import py_dotenv
+        path = join(dirname(__file__), '..', '.env')
+        py_dotenv.read_dotenv(path)
+    return development
+
+
 def serve():
     """ Calling serve function creates new `Bottle` app
         and loads dotenv if development mode is on (DEV=True)
@@ -5,18 +21,12 @@ def serve():
         and starts listen to port ($PORT)
         and returns the app instance
     """
-    import os
-    from os.path import join, dirname
     from bottle import Bottle
 
     main_app = Bottle()
 
     # load dotenv file only in development mode
-    development = bool(os.getenv('DEV'))
-    if development:
-        import py_dotenv
-        path = join(dirname(__file__), '..', '.env')
-        py_dotenv.read_dotenv(path)
+    development = load_env_if_dev()
 
     # import & register routes
     from app.routes.error import error_handler
