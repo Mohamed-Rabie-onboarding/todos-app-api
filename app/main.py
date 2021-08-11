@@ -1,4 +1,10 @@
 def main():
+    """ Calling main function creates new `Bottle` app
+        and loads dotenv if development mode is on (DEV=True)
+        and loads routes and register it to the main app
+        and starts listen to port ($PORT)
+        and returns the app instance
+    """
     import os
     from os.path import join, dirname
     from bottle import Bottle
