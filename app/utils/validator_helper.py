@@ -119,7 +119,9 @@ class ValidatorHelper:
             if `value` is not a valid email form it raise `ValueError`
             if `value` passes the validation it returns the class instance 
         """
-        if not validate_email(self.value):
+        try:
+            validate_email(self.value)
+        except:
             raise ValueError(f'{self.field} is not correct.')
 
         return self
@@ -139,8 +141,14 @@ class ValidatorHelper:
         errors = []
 
         for error in ve.errors():
+            field: str = error['loc'][0]
+            msg = error['msg']
+
+            if msg == 'field required':
+                msg = f'{field.capitalize()} is required.'
+
             errors.append(
-                _create_error(error['loc'][0], error['msg'])
+                _create_error(field, msg)
             )
 
         return {'errors': errors}
