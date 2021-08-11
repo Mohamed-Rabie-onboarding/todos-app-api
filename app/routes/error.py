@@ -1,4 +1,4 @@
-from utils.validator_helper import create_errors
+from app.utils.validator_helper import create_errors
 from bottle import HTTPError, response
 from json import dumps, loads
 

@@ -1,14 +1,14 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
-from database.models.base import Base
+from app.database.models.base import Base
 from sqlalchemy.orm import Session
 
 # import models to be defined
-from database.models.collection import CollectionOrm
-from database.models.user import UserOrm
-from database.models.todo import TodoOrm
-from database.models.todo_item import TodoItemOrm
+from app.database.models.collection import CollectionOrm
+from app.database.models.user import UserOrm
+from app.database.models.todo import TodoOrm
+from app.database.models.todo_item import TodoItemOrm
 
 
 def create_db_session(uri: str):

@@ -1,10 +1,10 @@
 from bottle import abort
 from sqlalchemy import Column, Integer, Date, ForeignKey, String
 from sqlalchemy.orm import relationship
-from database.models.base import Base, IToOrm
+from app.database.models.base import Base, IToOrm
 from datetime import datetime
 from pydantic import BaseModel, validator, ValidationError
-from utils.validator_helper import ValidatorHelper
+from app.utils.validator_helper import ValidatorHelper
 
 
 class CollectionOrm(Base, IToOrm):

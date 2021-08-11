@@ -1,11 +1,11 @@
 from bottle import abort
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship
-from database.models.base import Base, IToOrm
+from app.database.models.base import Base, IToOrm
 from datetime import datetime
 from pydantic import BaseModel, validator, ValidationError
 import bcrypt
-from utils.validator_helper import ValidatorHelper
+from app.utils.validator_helper import ValidatorHelper
 
 
 class UserOrm(Base, IToOrm):

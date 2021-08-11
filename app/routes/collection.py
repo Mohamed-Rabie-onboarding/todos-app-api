@@ -1,9 +1,9 @@
 from bottle import Bottle, request, response
-from utils.decorators import enable_cors, required_auth
-from utils.orm_helper import CollectionOrmHelper
-from database.models.collection import CollectionModel
-from utils.validator_helper import error_if_not_found
-from routes.error import error_handler
+from app.utils.decorators import enable_cors, required_auth
+from app.utils.orm_helper import CollectionOrmHelper
+from app.database.models.collection import CollectionModel
+from app.utils.validator_helper import error_if_not_found
+from app.routes.error import error_handler
 
 collectionRoutes = Bottle()
 collectionRoutes.error_handler = error_handler

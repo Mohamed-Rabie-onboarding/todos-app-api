@@ -1,9 +1,9 @@
 from bottle import Bottle, request, response
-from utils.decorators import enable_cors, required_auth
-from utils.orm_helper import TodoItemOrmHelper
-from utils.validator_helper import error_if_not_found
-from database.models.todo_item import TodoItemModel
-from routes.error import error_handler
+from app.utils.decorators import enable_cors, required_auth
+from app.utils.orm_helper import TodoItemOrmHelper
+from app.utils.validator_helper import error_if_not_found
+from app.database.models.todo_item import TodoItemModel
+from app.routes.error import error_handler
 
 todoItemRoutes = Bottle()
 todoItemRoutes.error_handler = error_handler

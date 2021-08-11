@@ -1,5 +1,5 @@
 from bottle import Bottle, static_file
-from routes.error import error_handler
+from app.routes.error import error_handler
 
 docsRoutes = Bottle()
 docsRoutes.error_handler = error_handler

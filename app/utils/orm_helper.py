@@ -1,10 +1,10 @@
 from typing import Union
-from database.db import db_session as db
+from app.database.db import db_session as db
 
-from database.models.user import UserModel, UserOrm
-from database.models.collection import CollectionModel, CollectionOrm
-from database.models.todo import TodoModel, TodoOrm
-from database.models.todo_item import TodoItemModel, TodoItemOrm
+from app.database.models.user import UserModel, UserOrm
+from app.database.models.collection import CollectionModel, CollectionOrm
+from app.database.models.todo import TodoModel, TodoOrm
+from app.database.models.todo_item import TodoItemModel, TodoItemOrm
 
 
 class UserOrmHelper:

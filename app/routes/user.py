@@ -1,10 +1,10 @@
 from bottle import Bottle, request, response, abort
-from database.models.user import UserModel
-from utils.jwt_helper import JwtHelper
-from utils.decorators import enable_cors, required_auth
-from utils.validator_helper import create_errors
-from utils.orm_helper import UserOrmHelper
-from routes.error import error_handler
+from app.database.models.user import UserModel
+from app.utils.jwt_helper import JwtHelper
+from app.utils.decorators import enable_cors, required_auth
+from app.utils.validator_helper import create_errors
+from app.utils.orm_helper import UserOrmHelper
+from app.routes.error import error_handler
 
 
 userRoutes = Bottle()
