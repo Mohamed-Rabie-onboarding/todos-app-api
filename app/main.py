@@ -1,15 +1,14 @@
-import py_dotenv
-import os
-from os.path import join, dirname
-from bottle import Bottle
-
-
 def main():
+    import os
+    from os.path import join, dirname
+    from bottle import Bottle
+
     app = Bottle()
 
     # load dotenv file only in development mode
     development = bool(os.getenv('DEV'))
     if development:
+        import py_dotenv
         path = join(dirname(__file__), '..', '.env')
         py_dotenv.read_dotenv(path)
 
