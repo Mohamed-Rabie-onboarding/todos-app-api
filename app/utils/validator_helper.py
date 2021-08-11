@@ -1,3 +1,4 @@
+from typing import Union
 from bottle import abort
 from pydantic import validate_email, ValidationError
 
@@ -52,16 +53,22 @@ class ValidatorHelper:
         working perfect with `pydantic` package
     """
     field: str
-    value: str
+    value: Union[str, bool]
 
-    def __init__(self, field: str, value: str):
+    def __init__(self, field: str, value: Union[str, bool]):
         """ __init__ is the initializar for `ValidatorHelper` class
 
             :param field: the maybe_not_valid_item
             :param value: the value which should be checked
         """
-        self.field = field
-        self.value = value.strip()
+        t = type(field)
+        if t != str and t != bool:
+            raise TypeError(f'Expect field of type str/bool but got {t}')
+        elif t == str and field.strip() == '':
+            raise ValueError('Expected field but got empty string')
+
+        self.field = field.strip()
+        self.value = value.strip() if type(value) == str else value
 
     def is_not_empty(self):
         """ Calling `is_not_empty` means that the value is required

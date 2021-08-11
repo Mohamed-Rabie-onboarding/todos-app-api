@@ -10,6 +10,8 @@ class TestJwtHelper(TestCase):
 
         with self.assertRaises(Exception):
             JwtHelper.sign()
+
+        with self.assertRaises(Exception):
             JwtHelper.sign('1')
 
     def test_verify(self):
@@ -19,4 +21,6 @@ class TestJwtHelper(TestCase):
 
         with self.assertRaises(Exception):
             JwtHelper.verify()
+
+        with self.assertRaises(Exception):
             JwtHelper.verify('wrong token')
