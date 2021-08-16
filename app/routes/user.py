@@ -11,7 +11,7 @@ userRoutes = Bottle()
 userRoutes.error_handler = error_handler
 
 
-@userRoutes.post('/')
+@userRoutes.route('/', method=['OPTIONS', 'POST'])
 @enable_cors
 def create_user_handler():
     """ create_user_handler
@@ -30,7 +30,7 @@ def create_user_handler():
     response.status = 201
 
 
-@userRoutes.post('/authenticate')
+@userRoutes.route('/authenticate', method=['OPTIONS', 'POST'])
 @enable_cors
 def authenticate_user_handler():
     """ authenticate_user_handler
@@ -53,7 +53,7 @@ def authenticate_user_handler():
     )
 
 
-@userRoutes.get('/')
+@userRoutes.route('/', method=['OPTIONS', 'GET'])
 @enable_cors
 @required_auth
 def get_current_user_handler(user_id: int):

@@ -9,7 +9,7 @@ collectionRoutes = Bottle()
 collectionRoutes.error_handler = error_handler
 
 
-@collectionRoutes.get('/<id:int>')
+@collectionRoutes.route('/<id:int>', method=['OPTIONS', 'GET'])
 @enable_cors
 @required_auth
 def get_collection_handler(user_id: int, id: int):
@@ -31,7 +31,7 @@ def get_collection_handler(user_id: int, id: int):
     return collection.to_dict()
 
 
-@collectionRoutes.get('/')
+@collectionRoutes.route('/', method=['OPTIONS', 'GET'])
 @enable_cors
 @required_auth
 def get_collections_handler(user_id: int):
@@ -52,7 +52,7 @@ def get_collections_handler(user_id: int):
     }
 
 
-@collectionRoutes.get('/<id:int>/todos')
+@collectionRoutes.route('/<id:int>/todos', method=['OPTIONS', 'GET'])
 @enable_cors
 @required_auth
 def get_collection_todos_handler(user_id: int, id: int):
@@ -78,7 +78,7 @@ def get_collection_todos_handler(user_id: int, id: int):
     }
 
 
-@collectionRoutes.get('/<id:int>/items')
+@collectionRoutes.route('/<id:int>/items', method=['OPTIONS', 'GET'])
 @enable_cors
 @required_auth
 def get_collection_items_handler(user_id: int, id: int):
@@ -111,7 +111,7 @@ def get_collection_items_handler(user_id: int, id: int):
     }
 
 
-@collectionRoutes.post('/')
+@collectionRoutes.route('/', method=['OPTIONS', 'POST'])
 @enable_cors
 @required_auth
 def create_collection_handler(user_id: int):
@@ -134,7 +134,7 @@ def create_collection_handler(user_id: int):
     return db_collection.to_dict()
 
 
-@collectionRoutes.put('/<id:int>')
+@collectionRoutes.route('/<id:int>', method=['OPTIONS', 'PUT'])
 @enable_cors
 @required_auth
 def update_collection_handler(user_id: int, id: int):
@@ -160,7 +160,7 @@ def update_collection_handler(user_id: int, id: int):
     response.status = 204
 
 
-@collectionRoutes.delete('/<id:int>')
+@collectionRoutes.route('/<id:int>', method=['OPTIONS', 'DELETE'])
 @enable_cors
 @required_auth
 def delete_collection_handler(user_id: int, id: int):

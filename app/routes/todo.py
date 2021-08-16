@@ -9,7 +9,7 @@ todoRoutes = Bottle()
 todoRoutes.error_handler = error_handler
 
 
-@todoRoutes.get('/<id:int>')
+@todoRoutes.route('/<id:int>', method=['OPTIONS', 'GET'])
 @enable_cors
 @required_auth
 def get_todo_handler(user_id: int, id: int):
@@ -31,7 +31,7 @@ def get_todo_handler(user_id: int, id: int):
     return todo.to_dict()
 
 
-@todoRoutes.get('/')
+@todoRoutes.route('/', method=['OPTIONS', 'GET'])
 @enable_cors
 @required_auth
 def get_todos_handler(user_id: int):
@@ -51,7 +51,7 @@ def get_todos_handler(user_id: int):
     }
 
 
-@todoRoutes.get('/<id:int>/items')
+@todoRoutes.route('/<id:int>/items', method=['OPTIONS', 'GET'])
 @enable_cors
 @required_auth
 def get_todo_items_handler(user_id: int, id: int):
@@ -77,7 +77,7 @@ def get_todo_items_handler(user_id: int, id: int):
     }
 
 
-@todoRoutes.post('/<collection_id:int>')
+@todoRoutes.route('/<collection_id:int>', method=['OPTIONS', 'POST'])
 @enable_cors
 @required_auth
 def create_todo_handler(user_id: int, collection_id: int):
@@ -101,7 +101,7 @@ def create_todo_handler(user_id: int, collection_id: int):
     return db_todo.to_dict()
 
 
-@todoRoutes.put('/<id:int>')
+@todoRoutes.route('/<id:int>', method=['OPTIONS', 'PUT'])
 @enable_cors
 @required_auth
 def update_todo_handler(user_id: int, id: int):
@@ -127,7 +127,7 @@ def update_todo_handler(user_id: int, id: int):
     response.status = 204
 
 
-@todoRoutes.delete('/<id:int>')
+@todoRoutes.route('/<id:int>', method=['OPTIONS', 'DELETE'])
 @enable_cors
 @required_auth
 def delete_todo_handler(user_id: int, id: int):
