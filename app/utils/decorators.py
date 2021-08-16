@@ -1,4 +1,5 @@
 from bottle import request, response, abort
+from sqlalchemy import log
 from app.utils.validator_helper import create_errors
 from app.utils.jwt_helper import JwtHelper
 
@@ -38,7 +39,7 @@ def enable_cors(fn):
     def _enable_cors(*args, **kwargs):
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, OPTIONS, DELETE"
-        response.headers["Access-Control-Allow-Headers"] = "Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token"
+        response.headers["Access-Control-Allow-Headers"] = "Authorization, Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token"
 
         if request.method != "OPTIONS":
             return fn(*args, **kwargs)
