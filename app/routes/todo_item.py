@@ -68,7 +68,7 @@ def create_todo_item_handler(user_id: int, todo_id: int):
     """
     item = TodoItemModel.factory(request.json)
 
-    db_item = item.to_orm(user_id, todo_id)
+    db_item = item.to_orm(user_id=user_id, todo_id=todo_id)
     TodoItemOrmHelper.create_todo_item(db_item)
 
     response.status = 201
