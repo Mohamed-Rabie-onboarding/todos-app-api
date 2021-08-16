@@ -1,8 +1,10 @@
 from app.utils.validator_helper import create_errors
 from bottle import HTTPError, response
 from json import dumps, loads
+from app.utils.decorators import enable_cors
 
 
+@enable_cors
 def _error_handler(error: HTTPError):
     """ _error_handler is the main error handler
         checking if the body of recived error is valid json
@@ -22,6 +24,7 @@ def _error_handler(error: HTTPError):
     return errors
 
 
+@enable_cors
 def _internal_server_error(_):
     """ _internal_server_error fire whenever unhandled error happen
         creates an error object and returns it as json along with code (500)
